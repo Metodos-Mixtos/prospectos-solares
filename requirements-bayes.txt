@@ -1,0 +1,16 @@
+# Stack bayesiano para los notebooks "1.1. Precisión del modelo" y "1.2. Test del modelo".
+# Instalar SOLO si se van a usar esos notebooks:  pip install -r requirements-bayes.txt
+#
+# ADVERTENCIA (Windows): pytensor, el motor de compilación de pymc, necesita un compilador C
+# para correr a velocidad razonable. Sin él cae a un backend en Python puro que es mucho más
+# lento. La vía recomendada por el proyecto pymc en Windows es conda-forge, no pip:
+#     conda install -c conda-forge pymc
+#
+# Además, ojo: estos dos notebooks todavía son código heredado del proyecto DHS/MPI y no
+# están adaptados al caso de paneles solares. No instales esto hasta que se decida
+# adaptarlos o retirarlos.
+
+-r requirements.txt
+
+pymc>=5.16
+arviz>=0.18

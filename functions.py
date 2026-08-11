@@ -22,7 +22,6 @@ import geopandas as gpd
 import geopandas as gpd
 from shapely.geometry import Point
 from shapely.geometry import box
-import fiona
 
 from matplotlib import pyplot as plt
 import seaborn as sns
@@ -36,7 +35,14 @@ from sklearn.compose import ColumnTransformer
 
 import os
 import shutil
-from PyPDF2 import PdfMerger
+# PyPDF2 quedó archivado en 2023 y su sucesor, pypdf, eliminó PdfMerger en la versión 6.
+# PdfWriter expone la misma interfaz (append / write / close), así que sirve de reemplazo
+# directo sin tocar create_pdf_report. Se conserva PyPDF2 como respaldo para entornos
+# que todavía lo tengan instalado.
+try:
+    from pypdf import PdfWriter as PdfMerger
+except ImportError:
+    from PyPDF2 import PdfMerger
 
 def resample_raster(input_path, output_path, scale, resampling_method=Resampling.bilinear):
     """

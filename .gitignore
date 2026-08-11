@@ -1,10 +1,23 @@
 __pycache__/
 temp_files/
 data/
+outputs/
 layers_data/
 .ipynb_checkpoints/
 venv/
+.venv/
 .env/
+.env
+
+# Rutas locales de cada máquina, ver config.py
+paths.local.json
+
+# Artefactos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Copias de seguridad locales
+*.bak
 compared_reports/
 predictions/
 *.log
