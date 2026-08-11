@@ -745,7 +745,7 @@ def añadir_restricciones_externas(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     """
     g = g.copy()
     try:
-        import capas_restriccion as cr
+        import insumos.restricciones as cr
     except Exception as exc:
         print(f"  restricciones externas no disponibles ({type(exc).__name__})")
         return g
@@ -792,7 +792,7 @@ def añadir_capacidad_barra(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         return g
 
     try:
-        import capacidad_barras as cb
+        import insumos.barras as cb
         cap = cb.capacidad_por_subestacion()
     except Exception as exc:
         print(f"  capacidad de barra       : no disponible ({type(exc).__name__})")
@@ -823,7 +823,7 @@ CARPETA_SAT = "satelital"
 def _atribucion_satelital() -> str:
     """Crédito de la imagen. El servicio lo exige y la ficha lo muestra."""
     try:
-        import satelital
+        import insumos.satelital as satelital
         return satelital.ATRIBUCION
     except Exception:
         return ""
@@ -843,7 +843,7 @@ def añadir_satelital(gw: gpd.GeoDataFrame) -> dict:
     try:
         import json as _json
         import shutil
-        import satelital
+        import insumos.satelital as satelital
     except Exception as exc:
         print(f"  imagen satelital         : no disponible ({type(exc).__name__})")
         return {}
@@ -903,7 +903,7 @@ def añadir_conflicto(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         return g
 
     try:
-        import conflicto
+        import insumos.conflicto as conflicto
         m = conflicto.por_municipio()
     except Exception as exc:
         print(f"  conflicto: no disponible ({type(exc).__name__})")
@@ -1020,7 +1020,7 @@ def añadir_vias(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     print(f"  distancia a vía          : faltan {int(faltan.sum())} celdas, se consultan")
     try:
-        import distancia_vias
+        import insumos.vias as distancia_vias
         res = distancia_vias.calcular(g.loc[faltan], verbose=False)
     except Exception as exc:
         print(f"    no se pudo consultar Overpass ({type(exc).__name__}), quedan sin dato")
@@ -1491,7 +1491,7 @@ def main(argv=None) -> int:
         # Capacidad disponible en barras, si alguien ya cargó el dato de la UPME.
         # Mientras no exista, la columna queda vacía y el reporte lo dice.
         try:
-            import capacidad_barras
+            import insumos.barras as capacidad_barras
             # Se cruza por el nombre base, sin exigir que coincida el nivel de tensión,
             # y así una misma subestación aporta su barra de alta y la de media si el
             # informe trae las dos. Antes se exigía coincidencia exacta de nombre y kV,

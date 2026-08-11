@@ -36,7 +36,9 @@ import requests
 from shapely.geometry import LineString
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# La raiz del proyecto va al path para poder importar config y gcs, que viven
+# un nivel arriba de este paquete.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 
 # Overpass responde 406 a las peticiones sin User-Agent propio, que es lo que manda
@@ -232,8 +234,8 @@ def main(argv=None) -> int:
     # Antes de molestar a Overpass, mirar si el equipo ya publicó estas respuestas.
     # Bajarlas del bucket tarda segundos; volver a descargarlas, veinte minutos.
     try:
-        import insumos
-        n = insumos.asegurar("osm_vias")
+        from . import asegurar
+        n = asegurar("osm_vias")
         if n:
             print(f"  recuperadas {n} respuestas de Overpass desde el bucket")
     except Exception:

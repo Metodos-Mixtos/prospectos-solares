@@ -30,7 +30,9 @@ import numpy as np
 import pandas as pd
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# La raiz del proyecto va al path para poder importar config y gcs, que viven
+# un nivel arriba de este paquete.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 import gcs
 

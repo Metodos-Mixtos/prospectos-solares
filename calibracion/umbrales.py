@@ -34,7 +34,9 @@ import numpy as np
 import pandas as pd
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# La raiz del proyecto va al path para poder importar config y gcs, que viven
+# un nivel arriba de este paquete.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 
 #: Percentiles que anclan la escala. El primero es el lado bueno de la distribución.
@@ -81,7 +83,7 @@ def enriquecer(con: "gpd.GeoDataFrame", con_vias: bool = True) -> "gpd.GeoDataFr
 
     con["dist_via"] = np.nan
     if con_vias:
-        import distancia_vias as dv
+        import insumos.vias as dv
         if "cell_id" not in con.columns:
             con["cell_id"] = [f"ref_{i:04d}" for i in range(len(con))]
         con["cell_id"] = con["cell_id"].astype(str)

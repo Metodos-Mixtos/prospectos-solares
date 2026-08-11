@@ -30,7 +30,9 @@ from pathlib import Path
 import requests
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# La raiz del proyecto va al path para poder importar config y gcs, que viven
+# un nivel arriba de este paquete.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 
 UA = "prospectos-solares/1.0 (Metodos Mixtos Consultores; prospeccion solar Colombia)"
@@ -120,8 +122,8 @@ def _voltaje(tags: dict) -> int | None:
 
 def main() -> int:
     try:
-        import insumos
-        n = insumos.asegurar("lineas_transmision")
+        from . import asegurar
+        n = asegurar("lineas_transmision")
         if n:
             print(f"  recuperados {n} bloques desde el bucket")
     except Exception:

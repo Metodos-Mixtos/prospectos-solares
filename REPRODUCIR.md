@@ -30,7 +30,7 @@ Todo lo que se descargó alguna vez de un servicio externo está publicado en
 todo, garantiza que dos personas partan del mismo dato:
 
 ```bash
-.venv/Scripts/python insumos.py bajar
+.venv/Scripts/python -m insumos bajar
 ```
 
 Son cinco conjuntos, todos crudos, tal como los devolvió la entidad:
@@ -200,7 +200,7 @@ Como los tres puntos son fijos y no dependen de las celdas que se estén evaluan
 Para recalcularlos, por ejemplo cuando entren plantas nuevas al registro de XM:
 
 ```bash
-.venv/Scripts/python umbrales_referencia.py
+.venv/Scripts/python -m calibracion umbrales
 ```
 
 Imprime los valores nuevos y hay que pegarlos a mano en `CRITERIOS`, dentro de
@@ -342,7 +342,7 @@ predios enteros de decenas de hectáreas donde el proyecto solo necesita dos.
 Solo si hace falta una versión más reciente que la publicada:
 
 ```bash
-.venv/Scripts/python capas_restriccion.py --refrescar --subir
+.venv/Scripts/python -m insumos restricciones --refrescar --subir
 ```
 
 Baja del FeatureServer del MADS y republica en el bucket, para que el resto del equipo
@@ -368,3 +368,28 @@ Dos avisos sobre lo que se descargó. Trece de las cien celdas no devolvieron ni
 y no es un fallo de la consulta: el catastro no llega ahí. Y hay un predio en Calamar con
 más de seiscientos mil vértices, unas cuatro mil veces la mediana, que llega así del IGAC
 y aparece en cuatro celdas porque cruza los linderos de la grilla.
+
+## Cómo está organizado el código
+
+```
+config.py              rutas del proyecto, multiplataforma
+gcs.py                 acceso al bucket
+check_setup.py         verifica que el entorno esté completo
+
+reporte_grillas.py     el maestro: toma las candidatas y produce los datos
+reporte_html.py        arma el HTML a partir de esos datos
+plantilla_reporte.py   la plantilla, separada para poder tocar el diseño sin el cálculo
+lote_predios.py        arma el lote de grillas que se lleva a búsqueda de predios
+
+insumos/               todo lo que se trae de fuera, siempre crudo y cacheado
+  vias · lineas · barras · restricciones · conflicto · satelital · normativa
+  python -m insumos bajar | subir | estado | <fuente>
+
+calibracion/           de dónde salen los parámetros de la matriz
+  pesos · umbrales · subestaciones
+  python -m calibracion <análisis>
+```
+
+`reporte_grillas.py` llama a lo que necesita de `insumos/` y descarga lo que falte, así
+que en el uso normal no hay que ejecutar nada de esos paquetes a mano. Los de
+`calibracion/` no corren nunca solos: sus resultados se pegan en `CRITERIOS` y `PERFILES`.

@@ -61,7 +61,9 @@ from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# La raiz del proyecto va al path para poder importar config y gcs, que viven
+# un nivel arriba de este paquete.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 
 CARPETA = config.PROJECT_ROOT / "data" / "barras"
@@ -616,7 +618,7 @@ def main(argv=None) -> int:
         print("     python capacidad_barras.py descargar")
         print("     python capacidad_barras.py extraer")
         print("     python capacidad_barras.py cargar")
-        print("     python insumos.py subir      (para que lo tenga todo el equipo)")
+        print("     python -m insumos subir      (para que lo tenga todo el equipo)")
         print()
         print("  O a mano, si aparece una fuente mejor:")
         print("     python capacidad_barras.py plantilla")
