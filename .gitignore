@@ -22,11 +22,68 @@ compared_reports/
 predictions/
 *.log
 *.sqlite3
-*.csv
 new-workspace.jupyterlab-workspace
 0. Data Downloads.ipynb
 1. Additional Layers.ipynb
+
+# ------------------------------------------------------------------
+# Datos: nada de esto va al repositorio
+# ------------------------------------------------------------------
+# Los insumos crudos viven en gs://prospectos_solares/insumos/ y se traen con
+# `python -m insumos bajar`. Todo lo calculado se regenera con los scripts en minutos.
+# Publicar datos en git solo crea copias que envejecen y acaban contradiciendo al código.
+#
+# Se ignora por extensión y no solo por carpeta: data/ y outputs/ ya estaban cubiertas,
+# pero un archivo dejado en la raíz se colaba sin que nadie lo notara.
+
+# Tablas
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.parquet
+*.feather
+
+# Geoespacial
+*.gpkg
+*.geojson
+*.kml
+*.kmz
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.sbn
+*.sbx
+*.qix
+
+# Ráster e imagen
+*.tif
+*.tiff
+*.img
+*.jp2
+*.jpg
+*.jpeg
+*.png
+*.nc
+*.hdf5
+*.h5
+
+# Modelos serializados y comprimidos
+*.pkl
+*.joblib
+*.zip
+*.7z
+*.tar.gz
+
+# Credenciales, por si alguna cae fuera de las rutas de siempre
 client_secrets.json
-model.pkl
-scaler_y.pkl
-model_trace.nc
+*credentials*.json
+*service-account*.json
+*.pem
+*.key
+
+# Excepciones: si algún día hace falta versionar un archivo de estos, se añade aquí
+# con ! delante. Por ejemplo, un logo o un archivo de referencia pequeño.
+# !docs/logo.png
