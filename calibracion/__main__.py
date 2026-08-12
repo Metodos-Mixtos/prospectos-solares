@@ -3,7 +3,7 @@ De dónde salen los parámetros de la matriz de criterios.
 
 Los tres análisis que sostienen el índice de aptitud. Ninguno corre al generar el
 reporte: se ejecutan de vez en cuando, sus resultados se pegan a mano en CRITERIOS y
-PERFILES dentro de reporte_grillas.py, y viven aquí para que cualquiera pueda auditarlos
+PERFILES dentro de reporte/datos.py, y viven aquí para que cualquiera pueda auditarlos
 o rehacerlos cuando cambien los datos de partida.
 
 Se pegan a mano y no se calculan al vuelo a propósito. Hacerlo en cada corrida obligaría

@@ -526,7 +526,7 @@ def cruzar(verbose: bool = True) -> pd.DataFrame:
     cap = cargar(verbose=verbose)
     conc_path = SALIDA / "concurrencia_subestaciones.csv"
     if not conc_path.exists():
-        raise SystemExit(f"Falta {conc_path}. Corre antes reporte_grillas.py")
+        raise SystemExit(f"Falta {conc_path}. Corre antes reporte/datos.py")
 
     conc = pd.read_csv(conc_path)
     conc["clave"] = conc["sub_nombre_subestacion"].map(normalizar)
@@ -538,7 +538,7 @@ def cruzar(verbose: bool = True) -> pd.DataFrame:
 
     cols = ["clave", "capacidad_disponible_mw"] + \
            [c for c in ("capacidad_asignada_mw", "ciclo", "fuente") if c in cap.columns]
-    # reporte_grillas.py ya deja capacidad_disponible_mw en el archivo, vacía mientras
+    # reporte/datos.py ya deja capacidad_disponible_mw en el archivo, vacía mientras
     # no haya dato. Si sobrevive al merge, pandas la renombra a _x y _y y el veredicto
     # acaba leyendo la vacía. No se notó hasta que hubo algo que cruzar.
     conc = conc.drop(columns=[c for c in cols if c != "clave" and c in conc.columns])

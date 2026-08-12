@@ -8,7 +8,7 @@ país que ya contienen una planta solar de la escala que se está prospectando:
     bueno  = mediana        donde está la mitad de lo construido, vale 70
     limite = percentil 90   más allá casi nadie ha construido, vale 0
 
-Los números que salen de aquí se pegan a mano en CRITERIOS, dentro de reporte_grillas.py.
+Los números que salen de aquí se pegan a mano en CRITERIOS, dentro de reporte/datos.py.
 No se calculan en cada corrida a propósito. Hacerlo obligaría a leer el panel completo y
 a consultar Overpass cada vez que se genera el reporte, y sobre todo un umbral que cambia
 solo es un umbral que nadie puede auditar: dos personas que corran el reporte el mismo día
@@ -62,7 +62,7 @@ def celdas_con_planta(mw_min: float) -> "gpd.GeoDataFrame":
 def enriquecer(con: "gpd.GeoDataFrame", con_vias: bool = True) -> "gpd.GeoDataFrame":
     """Añade las tres variables que no vienen en el panel, igual que el reporte."""
     import geopandas as gpd
-    import reporte_grillas as rg
+    import reporte.datos as rg
 
     s = gpd.read_file(config.SUBESTACIONES_PATH)
     kv = rg._num(s.get("tension", pd.Series(dtype=str))).where(lambda x: x > 0)
@@ -104,7 +104,7 @@ def main(argv=None) -> int:
                     help="omite la consulta a Overpass, que es la parte lenta")
     a = ap.parse_args(argv)
 
-    import reporte_grillas as rg
+    import reporte.datos as rg
 
     print("=" * 94)
     print(f"UMBRALES DE REFERENCIA  ·  plantas de {a.mw:.0f} MW o más")
@@ -148,7 +148,7 @@ def main(argv=None) -> int:
                                                       100 * fuera / len(s), aviso))
 
     print()
-    print("  Para pegar en CRITERIOS, dentro de reporte_grillas.py:")
+    print("  Para pegar en CRITERIOS, dentro de reporte/datos.py:")
     for k, (tope, bueno, limite) in nuevos.items():
         print(f'     "{k}": tope={tope}, bueno={bueno}, limite={limite},')
     print()

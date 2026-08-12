@@ -161,7 +161,7 @@ def calcular(g: gpd.GeoDataFrame, verbose: bool = True) -> pd.DataFrame:
     """
     Distancia a vía de las celdas que se le pasen. Devuelve cell_id y las dos columnas.
 
-    Está separada de main() para que reporte_grillas.py la llame con el GeoDataFrame
+    Está separada de main() para que reporte/datos.py la llame con el GeoDataFrame
     que tenga en memoria. Así no hay que acordarse de correr los scripts en un orden
     concreto ni de borrar un CSV viejo cuando cambian las candidatas.
     """

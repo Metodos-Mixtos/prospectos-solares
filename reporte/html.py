@@ -28,7 +28,7 @@ from pathlib import Path
 import geopandas as gpd
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 import gcs
 
@@ -438,7 +438,7 @@ def main() -> int:
     return 0
 
 
-from plantilla_reporte import PLANTILLA   # noqa: E402  (va aquí para no ensuciar la cabecera)
+from .plantilla import PLANTILLA   # noqa: E402  (va aquí para no ensuciar la cabecera)
 
 if __name__ == "__main__":
     sys.exit(main())
