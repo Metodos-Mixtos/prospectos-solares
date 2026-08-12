@@ -43,7 +43,7 @@ En Vertex AI Workbench este paso sobra: la VM tiene cuenta de servicio y `gcs.py
 toma sola. Comprobar que todo quedó en su sitio:
 
 ```bash
-.venv/Scripts/python check_setup.py
+.venv/Scripts/python herramientas/check_setup.py
 ```
 
 ---
@@ -93,7 +93,7 @@ Con la carpeta al lado sigue funcionando sin conexión.
 config.py              rutas del proyecto, resueltas en Windows, macOS y Vertex AI
 gcs.py                 acceso al bucket
 check_setup.py         verifica que el entorno esté completo
-lote_predios.py        arma el lote de grillas que se lleva a búsqueda de predios
+herramientas/lote_predios.py  arma el lote de grillas que se lleva a búsqueda de predios
 
 reporte/               el reporte
   datos.py               el maestro: enriquece, clasifica y escribe las tablas
@@ -134,7 +134,7 @@ que dos personas partan del mismo dato:
 | `restricciones` | Reserva Forestal de Ley 2ª de 1959 | MinAmbiente, SIAC |
 | `conflicto` | acciones bélicas desde 2022, un registro por hecho | SIEVCAC del CNMH |
 | `satelital` | una imagen por grilla | Esri World Imagery |
-| `normativa` | las normas completas que sustentan los criterios | ver `NORMATIVA.md` |
+| `normativa` | las normas completas que sustentan los criterios | ver `docs/NORMATIVA.md` |
 | `igac_predios` | predios por celda y capa | FeatureServer del IGAC |
 
 **Nada calculado por nosotros vive en el bucket.** Las distancias, las áreas, la

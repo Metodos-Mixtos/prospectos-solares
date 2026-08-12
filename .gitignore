@@ -84,6 +84,16 @@ client_secrets.json
 *.pem
 *.key
 
-# Excepciones: si algún día hace falta versionar un archivo de estos, se añade aquí
-# con ! delante. Por ejemplo, un logo o un archivo de referencia pequeño.
-# !docs/logo.png
+# ------------------------------------------------------------------
+# Excepción: el reporte generado sí va al repositorio
+# ------------------------------------------------------------------
+# entregables/ es el producto, no un dato intermedio: es lo que se le enseña al cliente
+# y lo que alguien quiere abrir sin instalar nada ni correr el pipeline. Por eso escapa
+# de las reglas de arriba, incluidas las imágenes satelitales que necesita para verse.
+#
+# AVISO. Son unos 27 MB, y git guarda una copia entera cada vez que cambian. Actualizarlo
+# en cada iteración engorda el historial deprisa, así que conviene subirlo cuando hay una
+# versión que de verdad se va a compartir y no en cada retoque. Si acaba pesando, la
+# salida es publicarlo como release de GitHub en vez de versionarlo.
+!entregables/
+!entregables/**

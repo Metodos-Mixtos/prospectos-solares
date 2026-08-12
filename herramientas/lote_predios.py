@@ -11,10 +11,10 @@ cell_id y la geometría; el resto de columnas va para poder leer el archivo sin 
 reporte.
 
 Uso:
-    .venv\\Scripts\\python.exe lote_predios.py --top 10
-    .venv\\Scripts\\python.exe lote_predios.py --clase Prioritaria
-    .venv\\Scripts\\python.exe lote_predios.py --zona Z04 --salida lote_z04
-    .venv\\Scripts\\python.exe lote_predios.py --ids 0012960,0011446
+    .venv\\Scripts\\python.exe herramientas/lote_predios.py --top 10
+    .venv\\Scripts\\python.exe herramientas/lote_predios.py --clase Prioritaria
+    .venv\\Scripts\\python.exe herramientas/lote_predios.py --zona Z04 --salida lote_z04
+    .venv\\Scripts\\python.exe herramientas/lote_predios.py --ids 0012960,0011446
 """
 
 from __future__ import annotations
@@ -27,7 +27,9 @@ from pathlib import Path
 import pandas as pd
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# La raiz del proyecto va al path para importar config y gcs, que viven un
+# nivel arriba de esta carpeta.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 
 SALIDA = config.PROJECT_ROOT / "outputs" / "reporte"

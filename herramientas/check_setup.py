@@ -9,17 +9,22 @@ Comprueba tres cosas, en orden, y no se detiene en el primer fallo:
 
 Uso:
 
-    python check_setup.py
+    python herramientas/check_setup.py
 
 En Windows con el entorno virtual del proyecto:
 
-    .venv\\Scripts\\python.exe check_setup.py
+    .venv\\Scripts\\python.exe herramientas/check_setup.py
 """
 
 from __future__ import annotations
 
 import importlib
 import sys
+from pathlib import Path
+
+# La raiz del proyecto va al path: config.py y functions.py viven un nivel arriba de
+# esta carpeta, y el verificador tiene que poder importarlos para comprobarlos.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 # (módulo importable, nombre en pip). Difieren cuando el paquete se llama distinto.
 NUCLEO = [

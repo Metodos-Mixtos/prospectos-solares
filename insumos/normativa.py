@@ -203,7 +203,7 @@ def main(argv=None) -> int:
     bajadas = [d for d in (descargar(n, a.forzar) for n in NORMAS) if d]
     print(f"\n  {len(bajadas)} de {len(NORMAS)} disponibles en {CARPETA}")
 
-    ruta_indice = config.PROJECT_ROOT / "NORMATIVA.md"
+    ruta_indice = config.PROJECT_ROOT / "docs" / "NORMATIVA.md"
     ruta_indice.write_text(indice(), encoding="utf-8")
     print(f"  índice -> {ruta_indice}")
 
