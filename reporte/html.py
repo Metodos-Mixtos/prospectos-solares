@@ -28,7 +28,8 @@ from pathlib import Path
 import geopandas as gpd
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+_raiz = Path(__file__).resolve().parent.parent
+sys.path[:0] = [str(_raiz), str(_raiz / "soporte")]
 import config
 import gcs
 
@@ -247,9 +248,24 @@ def cargar_divisiones() -> dict:
 
 
 def cargar_mapa() -> tuple[str, dict]:
-    """Contorno nacional y de los departamentos con candidatas."""
-    shp = gcs.obtener("geoinfo", "Colombia/Colombia_boundary/MGN_ADM_DPTO_POLITICO.shp",
-                      verbose=False)
+    """
+    Contorno nacional y de los departamentos con candidatas.
+
+    Si el bucket no responde, por credenciales caducadas o por estar sin conexión, el
+    reporte se genera igual y solo se queda sin el fondo del mapa. Antes esto tumbaba
+    todo el proceso al final, después de veinte minutos de cálculo, por una capa que es
+    decorativa.
+    """
+    try:
+        shp = gcs.obtener("geoinfo", "Colombia/Colombia_boundary/MGN_ADM_DPTO_POLITICO.shp",
+                          verbose=False)
+    except Exception as exc:
+        print(f"  aviso: sin contorno del país ({type(exc).__name__}). "
+              f"El mapa queda sin fondo; el resto del reporte no cambia.")
+        if "Refresh" in type(exc).__name__ or "auth" in str(exc).lower():
+            print("         renueva con: gcloud auth application-default login")
+        return "", {}
+
     d = gpd.read_file(shp).to_crs(config.CRS_GEOGRAFICO)
     col = next(c for c in d.columns if "CNMBR" in c.upper())
 

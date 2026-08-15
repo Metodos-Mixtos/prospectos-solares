@@ -16,7 +16,7 @@ utility, porque más de la mitad de los registros de XM son instalaciones de un
 megavatio o menos, que son tejados y no compran lotes.
 
 Uso:
-    .venv\\Scripts\\python.exe -m calibracion pesos
+    .venv\\Scripts\\python.exe -m soporte.calibracion pesos
 """
 
 from __future__ import annotations
@@ -32,7 +32,10 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 # La raiz del proyecto va al path para poder importar config y gcs, que viven
 # un nivel arriba de este paquete.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# La raiz y soporte/ van al path: config y gcs viven en soporte, y los
+# paquetes del pipeline se importan desde la raiz.
+_raiz = Path(__file__).resolve().parent.parent
+sys.path[:0] = [str(_raiz), str(_raiz / "soporte")]
 import config
 import gcs
 

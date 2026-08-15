@@ -43,7 +43,7 @@ En Vertex AI Workbench este paso sobra: la VM tiene cuenta de servicio y `gcs.py
 toma sola. Comprobar que todo quedó en su sitio:
 
 ```bash
-.venv/Scripts/python herramientas/check_setup.py
+.venv/Scripts/python soporte/herramientas/check_setup.py
 ```
 
 ---
@@ -93,7 +93,7 @@ Con la carpeta al lado sigue funcionando sin conexión.
 config.py              rutas del proyecto, resueltas en Windows, macOS y Vertex AI
 gcs.py                 acceso al bucket
 check_setup.py         verifica que el entorno esté completo
-herramientas/lote_predios.py  arma el lote de grillas que se lleva a búsqueda de predios
+soporte/herramientas/lote_predios.py  arma el lote de grillas que se lleva a búsqueda de predios
 
 reporte/               el reporte
   datos.py               el maestro: enriquece, clasifica y escribe las tablas
@@ -107,7 +107,7 @@ insumos/               todo lo que se trae de fuera, siempre crudo y cacheado
 
 calibracion/           de dónde salen los parámetros de la matriz
   pesos · umbrales · subestaciones
-  python -m calibracion <análisis>
+  python -m soporte.calibracion <análisis>
 ```
 
 `reporte/datos.py` llama a lo que necesita de `insumos/` y descarga lo que falte, así que
@@ -225,8 +225,8 @@ entero, porque medido contra todo el territorio la cercanía a la red se contaba
 Para recalcular los parámetros cuando entren plantas nuevas al registro de XM:
 
 ```bash
-.venv/Scripts/python -m calibracion umbrales
-.venv/Scripts/python -m calibracion pesos
+.venv/Scripts/python -m soporte.calibracion umbrales
+.venv/Scripts/python -m soporte.calibracion pesos
 ```
 
 Imprimen los valores nuevos y hay que pegarlos a mano en `reporte/datos.py`. No se
@@ -300,7 +300,7 @@ cómo se produjo su insumo principal. Conviene versionarlos.
 **La capa de subestaciones** es un consolidado con vigencias entre 2017 y 2021 y 159 de
 sus 499 registros sin fecha. Contrastada contra OpenStreetMap le faltan subestaciones, así
 que el operador conviene confirmarlo antes de cualquier gestión comercial. El detalle está
-en `python -m calibracion subestaciones`.
+en `python -m soporte.calibracion subestaciones`.
 
 **El stack bayesiano** de los notebooks 1.1 y 1.2 va aparte, en `requirements-bayes.txt`,
 porque `pytensor` necesita compilador C y en Windows la vía recomendada es conda-forge y

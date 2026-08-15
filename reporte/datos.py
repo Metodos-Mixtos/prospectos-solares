@@ -36,7 +36,8 @@ import pandas as pd
 
 warnings.filterwarnings("ignore")
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+_raiz = Path(__file__).resolve().parent.parent
+sys.path[:0] = [str(_raiz), str(_raiz / "soporte")]
 import config
 import gcs
 
@@ -73,7 +74,7 @@ SALIDA = config.PROJECT_ROOT / "outputs" / "reporte"
 # el 15%. Los de distancia, cobertura y recurso resultaron bien calibrados.
 REFERENCIA_N = 53
 REFERENCIA_MW = 10
-REFERENCIA_SCRIPT = "python -m calibracion umbrales"
+REFERENCIA_SCRIPT = "python -m soporte.calibracion umbrales"
 
 # El peso de cada criterio es su d de Cohen dividida por la suma de las seis.
 #

@@ -48,7 +48,7 @@ Cada paquete tiene su propio punto de entrada y se explica solo:
 ```bash
 python -m reporte --help
 python -m insumos --help
-python -m calibracion --help
+python -m soporte.calibracion --help
 ```
 
 ---
@@ -70,7 +70,7 @@ excepción es `entregables/`, porque es el producto y no un dato intermedio.
 python -m venv .venv
 .venv/Scripts/python.exe -m pip install -r requirements.txt
 gcloud auth application-default login
-.venv/Scripts/python.exe herramientas/check_setup.py
+.venv/Scripts/python.exe soporte/herramientas/check_setup.py
 ```
 
 El verificador dice qué falta y qué se puede correr ya. El detalle de cada paso, incluido

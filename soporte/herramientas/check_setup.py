@@ -24,7 +24,10 @@ from pathlib import Path
 
 # La raiz del proyecto va al path: config.py y functions.py viven un nivel arriba de
 # esta carpeta, y el verificador tiene que poder importarlos para comprobarlos.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# La raiz y soporte/ van al path: config y gcs viven en soporte, y los
+# paquetes del pipeline se importan desde la raiz.
+_raiz = Path(__file__).resolve().parent.parent
+sys.path[:0] = [str(_raiz), str(_raiz / "soporte")]
 
 # (módulo importable, nombre en pip). Difieren cuando el paquete se llama distinto.
 NUCLEO = [

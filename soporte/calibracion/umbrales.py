@@ -19,8 +19,8 @@ porque las de 1 MW son autogeneradores en techos industriales que no eligen el t
 van donde está la fábrica. Con 10 MW en adelante quedan las que sí lo eligen.
 
 Uso:
-    .venv\\Scripts\\python.exe -m calibracion umbrales
-    .venv\\Scripts\\python.exe -m calibracion umbrales --mw 20
+    .venv\\Scripts\\python.exe -m soporte.calibracion umbrales
+    .venv\\Scripts\\python.exe -m soporte.calibracion umbrales --mw 20
 """
 
 from __future__ import annotations
@@ -36,7 +36,10 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 # La raiz del proyecto va al path para poder importar config y gcs, que viven
 # un nivel arriba de este paquete.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# La raiz y soporte/ van al path: config y gcs viven en soporte, y los
+# paquetes del pipeline se importan desde la raiz.
+_raiz = Path(__file__).resolve().parent.parent
+sys.path[:0] = [str(_raiz), str(_raiz / "soporte")]
 import config
 
 #: Percentiles que anclan la escala. El primero es el lado bueno de la distribución.

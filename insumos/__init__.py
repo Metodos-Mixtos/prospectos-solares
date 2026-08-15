@@ -30,9 +30,10 @@ import argparse
 import sys
 from pathlib import Path
 
-# La raiz del proyecto va al path para poder importar config y gcs, que viven
-# un nivel arriba de este paquete.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# La raiz y soporte/ van al path: config y gcs viven en soporte/, y los paquetes
+# del pipeline se importan desde la raiz.
+_raiz = Path(__file__).resolve().parent.parent
+sys.path[:0] = [str(_raiz), str(_raiz / "soporte")]
 import config
 import gcs
 

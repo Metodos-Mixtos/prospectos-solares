@@ -21,9 +21,9 @@ mismo día tienen que obtener la misma nota para la misma grilla.
                    saber cuánta red le falta y si el criterio de conexión mide bien.
 
 Uso:
-    .venv\\Scripts\\python.exe -m calibracion pesos
-    .venv\\Scripts\\python.exe -m calibracion umbrales --mw 20
-    .venv\\Scripts\\python.exe -m calibracion subestaciones
+    .venv\\Scripts\\python.exe -m soporte.calibracion pesos
+    .venv\\Scripts\\python.exe -m soporte.calibracion umbrales --mw 20
+    .venv\\Scripts\\python.exe -m soporte.calibracion subestaciones
 """
 
 from __future__ import annotations
@@ -35,7 +35,10 @@ from pathlib import Path
 warnings.filterwarnings("ignore")
 # La raíz del proyecto va al path para que los tres análisis puedan importar config,
 # gcs y reporte_grillas igual que cuando estaban sueltos en la raíz.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# La raiz y soporte/ van al path: config y gcs viven en soporte, y los
+# paquetes del pipeline se importan desde la raiz.
+_raiz = Path(__file__).resolve().parent.parent
+sys.path[:0] = [str(_raiz), str(_raiz / "soporte")]
 
 ANALISIS = {
     "pesos": "Efecto de cada covariable, la d que pondera los criterios",

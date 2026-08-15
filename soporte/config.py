@@ -63,7 +63,10 @@ _consola_utf8()
 # Raíz del proyecto y carpetas locales
 # --------------------------------------------------------------------------
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+# La raíz es el directorio que contiene a soporte/, no el de este archivo. Todas las
+# rutas del proyecto cuelgan de aquí, así que si esto apunta mal no se encuentra ni el
+# panel ni los insumos ni las salidas.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 DATA_DIR = PROJECT_ROOT / "data"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
