@@ -141,6 +141,53 @@ entregable, no.
 
 ---
 
+## La bandeja del bucket: nada depende de una ruta local
+
+Hay tres archivos que el procedimiento necesita y que **no produce él mismo**: las
+candidatas del modelo, la tabla maestra y las grillas elegidas. Antes había que tenerlos
+en el disco de quien corría, en una ruta que solo existía en esa máquina. Eso ataba el
+proyecto a un computador y obligaba a mandarse ficheros por correo.
+
+Ahora se suben una vez a la bandeja del bucket y cualquiera los lee desde donde esté:
+
+```
+gs://prospectos-solares-insumos/entradas/
+    candidatas/     las 100 que salen del cuaderno 1 (top_candidates.gpkg)
+    maestra/        la tabla maestra de grillas candidatas
+    grillas/        las elegidas de esas 100, insumo del paso 1
+    certificados/   los folios de tradición y libertad, en PDF
+```
+
+Se maneja así:
+
+```bash
+python soporte/bandeja.py ls                      qué hay en cada bandeja
+python soporte/bandeja.py ls grillas              el detalle de una
+python soporte/bandeja.py subir grillas mis_grillas.geojson
+python soporte/bandeja.py bajar grillas ultima
+```
+
+Y `ejecutar.py` admite las cuatro formas de nombrar un insumo, sin que cambie nada más:
+
+```bash
+ejecutar.py --corrida x --grillas outputs/reporte/grillas_para_predios.geojson
+ejecutar.py --corrida x --grillas gs://prospectos-solares-insumos/entradas/grillas/melgar.geojson
+ejecutar.py --corrida x --grillas melgar.geojson       por su nombre en la bandeja
+ejecutar.py --corrida x --grillas ultima               el más reciente que haya
+```
+
+Si la referencia es una ruta local que existe, no se toca el bucket siquiera. Si no
+existe, se busca en la bandeja, y si tampoco está se dice qué hay en ella en vez de
+fallar con un mensaje seco.
+
+**Los certificados funcionan igual.** La bandeja de `predios/certificado_ia.py` se surte
+del bucket antes de mirar la carpeta local, así que quien tenga un folio lo sube a
+`entradas/certificados/` y el procedimiento lo recoge, sin necesidad de tener el
+repositorio clonado. Si el bucket no está a mano se sigue con lo que haya en disco, como
+antes.
+
+---
+
 ## Cómo quedan las carpetas en la máquina local
 
 Del repositorio baja **solo código y documentación**. Todo lo demás se crea al correr, o se

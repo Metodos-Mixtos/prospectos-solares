@@ -850,6 +850,23 @@ def _resumen_final(c: Corrida) -> None:
     _linea(f"  manifiesto -> {c.manifiesto_path}")
 
 
+def _resolver_entrada(ref, carpeta: str):
+    """
+    Ruta local, objeto del bucket o nombre en la bandeja. El detalle, en soporte/bandeja.py.
+
+    Se importa aquí dentro y no arriba para que quien corra con --sin-bucket no necesite
+    google-cloud-storage instalado. Si la referencia es una ruta que existe, ni se toca
+    el bucket.
+    """
+    if ref is None:
+        return None
+    ruta = Path(ref)
+    if ruta.exists():
+        return ruta
+    import bandeja
+    return bandeja.resolver(ref, carpeta=carpeta)
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
         description="Hilo conductor del proyecto: de las grillas a los entregables.")
@@ -858,7 +875,10 @@ def main(argv=None) -> int:
                          "outputs/corridas/<n>, entregables/<n> y salidas/<n> en el bucket")
     ap.add_argument("--grillas", default=None,
                     help="GeoJSON, GPKG o CSV de celdas. Único insumo obligatorio; se "
-                         "puede omitir al reanudar con --desde 2 o más")
+                         "puede omitir al reanudar con --desde 2 o más. Admite una "
+                         "ruta local, un objeto gs://, el nombre de un archivo de la "
+                         "bandeja del bucket, o la palabra ultima para tomar el más "
+                         "reciente que haya en ella")
     ap.add_argument("--maestra", default=None,
                     help="tabla maestra de grillas candidatas de la que se completan las "
                          "columnas que el lote hereda de su celda "
@@ -891,11 +911,9 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
 
     perfiles = ["utility", "distribuida"] if a.perfil == "ambos" else [a.perfil]
-    maestra = (Path(a.maestra) if a.maestra
+    maestra = (_resolver_entrada(a.maestra, "maestra") if a.maestra
                else config.OUTPUTS_DIR / "reporte" / "grillas_candidatas.gpkg")
-    grillas = Path(a.grillas) if a.grillas else None
-    if grillas is not None and not grillas.exists():
-        raise SystemExit(f"No existe el archivo de grillas: {grillas}")
+    grillas = _resolver_entrada(a.grillas, "grillas")
 
     try:
         c = Corrida(a.corrida, perfiles, sin_bucket=a.sin_bucket)

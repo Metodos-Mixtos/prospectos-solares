@@ -829,6 +829,49 @@ ENTRADA = config.PROJECT_ROOT / "insumos" / "certificados"
 LEIBLES = {".pdf", ".txt"}
 
 
+def _surtir_del_bucket(carpeta: Path, verbose: bool = True) -> int:
+    """
+    Trae a la carpeta local los certificados que alguien haya dejado en el bucket.
+
+    Con esto se cumple lo que se acordó el 4 de septiembre de 2026: quien tenga un folio
+    lo sube a `entradas/certificados/` y el procedimiento lo recoge, sin necesidad de
+    tener el repositorio clonado ni de mandarse ficheros por correo.
+
+    Si el bucket no está a mano no pasa nada: se sigue con lo que haya en disco, que es
+    como funcionaba antes. Un fallo aquí nunca debe impedir leer los folios locales.
+    """
+    try:
+        raiz = Path(__file__).resolve().parent.parent / "soporte"
+        if str(raiz) not in sys.path:
+            sys.path.insert(0, str(raiz))
+        import bandeja as _bandeja
+        filas = _bandeja.listar("certificados")
+    except Exception as exc:
+        if verbose:
+            print("  bandeja del bucket no disponible (" + type(exc).__name__
+                  + "); se usa solo la carpeta local")
+        return 0
+
+    traidos = 0
+    for objeto, _tam, _fecha in filas:
+        nombre = Path(objeto).name
+        if Path(nombre).suffix.lower() not in LEIBLES:
+            continue
+        destino = carpeta / nombre
+        if destino.exists():
+            continue
+        try:
+            origen = _bandeja.resolver(nombre, carpeta="certificados", verbose=False)
+            shutil.copy2(origen, destino)
+            traidos += 1
+            if verbose:
+                print("  traído de la bandeja del bucket: " + nombre)
+        except Exception as exc:
+            if verbose:
+                print("  no se pudo traer " + nombre + " (" + type(exc).__name__ + ")")
+    return traidos
+
+
 def bandeja(carpeta: Path | None = None, forzar: bool = False,
             verbose: bool = True) -> dict:
     """
@@ -843,11 +886,11 @@ def bandeja(carpeta: Path | None = None, forzar: bool = False,
     con su motivo, para que quien los dejó ahí sepa qué pasó con cada uno.
     """
     carpeta = Path(carpeta or ENTRADA)
-    if not carpeta.exists():
-        carpeta.mkdir(parents=True, exist_ok=True)
-        if verbose:
-            print(f"  carpeta de certificados creada: {carpeta}")
-        return {"leidos": 0, "ya_estaban": 0, "fallidos": []}
+    carpeta.mkdir(parents=True, exist_ok=True)
+
+    # Primero la bandeja del bucket, para que quien dejó ahí un folio no tenga que
+    # tenerlo también en esta máquina.
+    _surtir_del_bucket(carpeta, verbose=verbose)
 
     ficheros = sorted(f for f in carpeta.iterdir()
                       if f.is_file() and f.suffix.lower() in LEIBLES)
