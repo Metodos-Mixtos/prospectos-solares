@@ -480,7 +480,7 @@ def paso_0_verificar(c: Corrida, grillas: Path | None, maestra: Path) -> dict:
             _linea("         Corre:  gcloud auth application-default login")
             _linea("         La corrida sigue; lo que produzca queda en disco y se "
                    "publica después con")
-            _linea(f"         python soporte/gcs.py sync prospectos {c.prefijo} "
+            _linea(f"         python soporte/gcs.py sync {config.BUCKET_SALIDAS} {c.prefijo} "
                    f"{c.destino}")
             avisos.append("sin acceso al bucket")
 
