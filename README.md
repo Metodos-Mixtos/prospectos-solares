@@ -16,13 +16,14 @@ Métodos Mixtos Consultores.
 
 1. [Las tres etapas](#las-tres-etapas)
 2. [Puesta en marcha, paso a paso](#puesta-en-marcha-paso-a-paso)
-3. [Cómo se corre](#cómo-se-corre)
-4. [La bandeja del bucket](#la-bandeja-del-bucket)
-5. [Cómo quedan las carpetas](#cómo-quedan-las-carpetas)
-6. [Qué no está en el repositorio](#qué-no-está-en-el-repositorio)
-7. [Qué se reproduce igual y qué no](#qué-se-reproduce-igual-y-qué-no)
-8. [Cuando algo falla](#cuando-algo-falla)
-9. [Documentación](#documentación)
+3. [El orden en que se corre](#el-orden-en-que-se-corre)
+4. [Cómo se corre en detalle](#cómo-se-corre)
+5. [La bandeja del bucket](#la-bandeja-del-bucket)
+6. [Cómo quedan las carpetas](#cómo-quedan-las-carpetas)
+7. [Qué no está en el repositorio](#qué-no-está-en-el-repositorio)
+8. [Qué se reproduce igual y qué no](#qué-se-reproduce-igual-y-qué-no)
+9. [Cuando algo falla](#cuando-algo-falla)
+10. [Documentación](#documentación)
 
 ---
 
@@ -182,6 +183,88 @@ exacto para arreglarlo. Es lo primero que debería correr quien acaba de clonar.
 > sin `data/`, sin `outputs/` y sin `.env`, y se corrió desde ahí. El paso 1 bajó las
 > grillas y la tabla maestra de la bandeja del bucket, y el paso 2 descargó el catastro del
 > IGAC desde cero en 432 segundos. No hizo falta ningún fichero de otra máquina.
+
+---
+
+## El orden en que se corre
+
+Esta es la pregunta que hay que responder primero: **qué archivo se corre, y en qué orden.**
+
+### El caso normal: solo un comando
+
+Si las grillas ya están elegidas, que es lo habitual, **basta con esto**:
+
+```bash
+.venv\Scripts\python.exe ejecutar.py --corrida <nombre> --grillas ultima
+```
+
+`ejecutar.py` encadena los ocho pasos y llama por dentro a `predios_igac`, `lotes`,
+`matricula_auto` y `reporte_predios`. **No hay que correr esos módulos a mano**, y hacerlo
+para producir un entregable es justamente el error que este punto de entrada existe para
+impedir.
+
+### La cadena completa, de principio a fin
+
+Cada eslabón produce el insumo del siguiente. Se corren en este orden, y solo hace falta
+retroceder hasta donde algo haya cambiado:
+
+| Orden | Qué se corre | Cuándo hace falta | Produce |
+|---|---|---|---|
+| 1 | `1. Selección de grillas.ipynb` | solo si hay que rehacer el modelo o cambió el panel | las 100 candidatas, `top_candidates.gpkg` |
+| 2 | `python -m reporte` | si cambió el modelo, las fuentes o los umbrales | `reporte_grillas.html` y la tabla maestra |
+| 3 | se eligen las grillas en el visor | siempre que se quiera otro conjunto de lotes | `grillas_para_predios.geojson` |
+| 4 | `ejecutar.py --corrida <nombre> --grillas ultima` | **siempre.** Es el que produce el entregable | `reporte_predios.html` y el Excel |
+
+Los cuadernos `1.1` y `1.2` son validación del modelo y **no hacen falta** para producir
+nada. No están en la cadena.
+
+### Antes de la primera vez
+
+```bash
+.venv\Scripts\python.exe ejecutar.py --corrida prueba --hasta 0
+```
+
+No escribe nada y dice qué falta. Córralo una vez tras instalar.
+
+### Dos caminos aparte
+
+**El piloto no pasa por `ejecutar.py`.** Tiene su propio encadenado, porque inyecta una
+celda que no está entre las 100 candidatas:
+
+```bash
+.venv\Scripts\python.exe outputs\piloto\ejecutar_piloto.py
+```
+
+**Rehacer solo una parte**, sin repetir lo caro:
+
+```bash
+ejecutar.py --corrida <nombre> --desde 5     rehace el visor en minutos
+python -m reporte_predios                    solo el visor, suelto
+python -m insumos bajar                      traer insumos del bucket
+python soporteandeja.py ls                 ver qué hay en la bandeja
+```
+
+### Cómo se llaman entre sí
+
+El patrón es el mismo en todo el proyecto: **el `__main__` orquesta y no calcula, `datos.py`
+calcula y no maqueta, `html.py` maqueta y no calcula.** Por eso se puede rehacer el HTML tras
+tocar el diseño sin recalcular nada.
+
+```
+ejecutar.py                       el hilo conductor de la etapa 3
+   ├─ predios_igac.main()         paso 2, catastro
+   ├─ lotes.main()                paso 3, medición y caracterización
+   ├─ matricula_auto              paso 4, registro
+   └─ reporte_predios.datos.main() y .html.main()    paso 5, visor
+
+reporte/__main__.py               la etapa 2
+   ├─ datos.main()                calcula
+   └─ html.main()                 maqueta
+```
+
+La etapa 1 es la excepción y no tiene punto de entrada: son los cuadernos, y
+`modelo/functions.py` es su librería de apoyo, no un ejecutable. Ahí está la frontera entre
+lo exploratorio y lo productivo.
 
 ---
 
