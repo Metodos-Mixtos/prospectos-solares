@@ -231,13 +231,13 @@ _ENERGIA = GEOINFO / "Colombia" / "Energia_electrica"
 #   Colombia/Energia_electrica/Proyectos de generación (XM).geojson
 
 _CACHE_GEOINFO = DATA_DIR / "geoinfo"
-_CACHE_PROSPECTOS = DATA_DIR / "prospectos_solares"
+_CACHE_PROSPECTOS = DATA_DIR / "prospectos"
 
 #: (ruta_en_drive, bucket, objeto_en_bucket) para cada insumo
 _INSUMOS = {
     "panel": (
         PANELES_SOLARES / "fuentes" / "datos" / "Panel-VF-panel_final.gpkg",
-        "prospectos_solares",
+        "prospectos",
         "Panel/VF/panel_final.gpkg",
     ),
     "granjas": (

@@ -217,9 +217,9 @@ Este paso es fácil de olvidar porque **ningún comando lo llama solo**. Sin él
 ### 4.3 La base veredal
 
 De ella salen el nombre del municipio y el de la vereda de cada grilla y de cada lote.
-Es el único insumo que no trae ningún comando de descarga: no está en
-el bucket de insumos, y `asegurar_datos` no la incluye. Son 352 MB en cinco ficheros y
-se piden así:
+Sí está en el bucket, completa: los cinco ficheros del shapefile, 352 MB en total,
+bajo `geoinfo/base_veredas/`. Lo que pasa es que `asegurar_datos` no la incluye, así
+que es el único insumo que hay que pedir a mano:
 
 ```powershell
 .venv\Scripts\python.exe soporte\gcs.py get geoinfo "base_veredas/base_veredas.shp"
