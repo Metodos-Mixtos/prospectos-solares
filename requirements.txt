@@ -31,7 +31,8 @@ folium>=0.16
 mapclassify>=2.6
 
 # --- Datos en la nube ---
-# Los insumos viven en los buckets del proyecto GCP mmc-general. Ver gcs.py
+# Los insumos viven en los buckets del proyecto GCP prospectos-solares. Ver
+# soporte/gcs.py y soporte/bandeja.py
 google-cloud-storage>=2.16
 
 # --- Utilidades ---

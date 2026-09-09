@@ -425,6 +425,44 @@ def _claves_env() -> dict[str, bool]:
     return puestas
 
 
+def _asegurar_capas_base(sin_bucket: bool) -> list[str]:
+    """
+    Baja del bucket las capas base que falten, antes de comprobar nada.
+
+    Existe porque el paso 3 muere sin las subestaciones, y en una máquina recién clonada
+    no están. Hasta el 9 de septiembre de 2026 el paso 0 se limitaba a avisar de que
+    faltaban, la corrida seguía, y reventaba tres pasos más tarde con un DataSourceError
+    que no decía qué hacer. Ahora se traen aquí y el aviso queda para lo que de verdad no
+    se puede resolver solo.
+
+    `config.asegurar_datos` cubre el panel, las granjas y las subestaciones. La base
+    veredal no está en esa lista y pesa 352 MB en cinco ficheros, así que se pide aparte
+    y se avisa de la descarga, que la primera vez tarda.
+
+    Devuelve la lista de lo que se trajo. Un fallo aquí no aborta: el chequeo de después
+    dirá qué sigue faltando.
+    """
+    if sin_bucket:
+        return []
+    traidas = []
+    try:
+        import gcs
+        if not config.SUBESTACIONES_PATH.exists():
+            _linea("  bajando capas base del bucket (panel, granjas y subestaciones)")
+            config.asegurar_datos(verbose=False)
+            traidas.append("capas base")
+        veredas = config.DATA_DIR / "geoinfo" / "base_veredas" / "base_veredas.shp"
+        if not veredas.exists():
+            _linea("  bajando la base veredal del bucket: 352 MB, la primera vez tarda")
+            for sufijo in ("shp", "shx", "dbf", "prj", "cpg"):
+                gcs.obtener("geoinfo", "base_veredas/base_veredas." + sufijo, verbose=False)
+            traidas.append("base veredal")
+    except Exception as exc:
+        _linea("  aviso  no se pudieron bajar las capas base: "
+               + type(exc).__name__ + ": " + str(exc)[:110])
+    return traidas
+
+
 def paso_0_verificar(c: Corrida, grillas: Path | None, maestra: Path) -> dict:
     """Comprueba lo que hace falta antes de empezar. No escribe nada."""
     faltan, avisos = [], []
@@ -438,15 +476,15 @@ def paso_0_verificar(c: Corrida, grillas: Path | None, maestra: Path) -> dict:
         return ok
 
     _linea("Insumos")
+    _asegurar_capas_base(c.sin_bucket)
     if grillas is not None:
         _chk("grillas de entrada", grillas)
     else:
         ya = c.destino / "grillas_para_predios.geojson"
         _chk("grillas de la corrida", ya)
     _chk("tabla maestra de grillas", maestra, critico=False)
-    _chk("subestaciones", config.SUBESTACIONES_PATH, critico=False)
-    _chk("base veredal", config.DATA_DIR / "geoinfo" / "base_veredas" / "base_veredas.shp",
-         critico=False)
+    _chk("subestaciones", config.SUBESTACIONES_PATH)
+    _chk("base veredal", config.DATA_DIR / "geoinfo" / "base_veredas" / "base_veredas.shp")
 
     _linea()
     _linea("Credenciales (.env; nunca se imprime ningún valor)")

@@ -139,3 +139,18 @@ _rev/
 _*_cap/
 _*_capture/
 _verif_*/
+
+# Presentaciones. Se quedan fuera del repositorio por decisión del equipo: son
+# entregables de cliente, cambian con cada reunión y sus PDF pesan.
+presentacion/
+presentacion_sb/
+
+# outputs/ está ignorada, pero dentro viven cuatro scripts que SÍ son código y sin
+# los cuales el procedimiento se degrada en silencio. Están añadidos a la fuerza
+# (git add -f) para no cambiarles la ruta: matricula_auto.py carga el primero por
+# ruta absoluta, y el del piloto es su encadenado completo.
+#     outputs/matricula/cosechar_municipal.py
+#     outputs/catastro_municipal/bajar_villavicencio.py
+#     outputs/monteria/monteria_lotes.py
+#     outputs/piloto/ejecutar_piloto.py
+
