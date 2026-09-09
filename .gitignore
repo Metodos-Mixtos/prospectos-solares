@@ -154,3 +154,10 @@ presentacion_sb/
 #     outputs/monteria/monteria_lotes.py
 #     outputs/piloto/ejecutar_piloto.py
 
+# Notas de reunion. Nunca al repositorio: las de Gemini y Meet incrustan capturas
+# de la videollamada, o sea CARAS de personas identificables, ademas de pestanas
+# del navegador de quien comparte pantalla, que pueden ser de otro cliente.
+docs/*Notes by*
+docs/*Notas de*
+*Notes by Gemini*
+
