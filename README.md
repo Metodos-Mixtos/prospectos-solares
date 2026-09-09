@@ -261,7 +261,8 @@ python soporte/bandeja.py subir grillas mis_grillas.geojson
 python soporte/bandeja.py bajar grillas ultima
 ```
 
-`--grillas` y `--maestra` admiten **cuatro formas** de nombrar un insumo:
+`--grillas` y `--maestra` de `ejecutar.py`, y `--celdas` de `python -m reporte`,
+admiten **cuatro formas** de nombrar un insumo:
 
 ```bash
 --grillas outputs/reporte/grillas_para_predios.geojson                  ruta local

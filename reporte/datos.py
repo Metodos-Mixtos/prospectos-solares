@@ -425,6 +425,29 @@ def _num(serie: pd.Series) -> pd.Series:
     )
 
 
+def _de_la_bandeja(ref):
+    """
+    Las candidatas, traídas de la bandeja del bucket cuando no están en disco.
+
+    Existe para que la etapa 2 corra en una máquina recién clonada. Antes, si no estaba
+    top_candidates.gpkg en local, el reporte se detenía y mandaba a correr el cuaderno 1,
+    aunque el archivo estuviera subido a la bandeja y a un comando de distancia.
+
+    Acepta lo mismo que --grillas de ejecutar.py: ruta, objeto gs://, nombre suelto de la
+    bandeja, o "ultima" para el más reciente.
+    """
+    sop = str(config.PROJECT_ROOT / "soporte")
+    if sop not in sys.path:
+        sys.path.insert(0, sop)
+    try:
+        import bandeja
+    except Exception as exc:
+        raise SystemExit(
+            "No están las candidatas en disco y no se pudo abrir la bandeja del bucket ("
+            + type(exc).__name__ + "). Corre el cuaderno 1, o pasa --celdas con una ruta.")
+    return bandeja.resolver(ref or "ultima", carpeta="candidatas")
+
+
 def cargar_candidatas(ruta: str | Path | None = None) -> gpd.GeoDataFrame:
     """
     Lee las celdas a caracterizar. Por defecto las que dejó el notebook 1.
@@ -434,13 +457,12 @@ def cargar_candidatas(ruta: str | Path | None = None) -> gpd.GeoDataFrame:
     lo deriva. Si mañana el modelo devuelve otras cien celdas, o mil, el procedimiento
     es el mismo y no hay nada que ajustar a mano.
     """
+    ref = ruta
     ruta = Path(ruta) if ruta else config.TOP_CANDIDATOS_PATH
     if not ruta.is_absolute():
         ruta = config.PROJECT_ROOT / ruta
     if not ruta.exists():
-        raise SystemExit(
-            f"No existe {ruta}\nCorre antes el notebook 1 para generar las candidatas."
-        )
+        ruta = _de_la_bandeja(ref)
     g = gpd.read_file(ruta)
     if "cell_id" not in g.columns:
         raise SystemExit(f"{ruta.name} no tiene columna cell_id")
