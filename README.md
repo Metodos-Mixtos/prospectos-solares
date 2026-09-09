@@ -43,6 +43,11 @@ completo y se abren en el navegador sin instalar nada:
 [`modelo.html`](docs/diagramas/modelo.html) para las etapas 1 y 2, y
 [`pipeline.html`](docs/diagramas/pipeline.html) para la 3.
 
+> **Si cambia el flujo, hay que regenerarlos.** Un diagrama viejo miente con más autoridad
+> que un texto viejo, porque nadie lo pone en duda. Los `.workflow.json` de esa carpeta son
+> la fuente; se regeneran con el skill `archify`, que valida la composición y comprueba el
+> resultado en un navegador antes de dar el HTML por bueno.
+
 **La costura entre etapas es un archivo.** La etapa 1 deja `top_candidates.gpkg`; sin él,
 `reporte/datos.py` se detiene y lo dice. Los cuadernos son exploratorios; de la etapa 2 en
 adelante todo es productivo. Los tres archivos de costura viven en la

@@ -18,6 +18,9 @@
         },
         "messagebus": {
           "label": "Entrega al pipeline"
+        },
+        "cloud": {
+          "label": "Bandeja del bucket"
         }
       }
     },
@@ -105,18 +108,18 @@
       "id": "panel",
       "lane": "insumos",
       "col": 0,
-      "type": "database",
+      "type": "cloud",
       "label": "Panel de grillas",
-      "sublabel": "una fila por celda del país",
-      "width": 118
+      "sublabel": "del bucket, una fila por celda",
+      "width": 134
     },
     {
       "id": "granjas_sub",
       "lane": "insumos",
       "col": 1,
-      "type": "external",
+      "type": "cloud",
       "label": "Granjas y red",
-      "sublabel": "XM y subestaciones del SIN",
+      "sublabel": "del bucket: XM y SIN",
       "width": 118
     },
     {
@@ -150,9 +153,9 @@
       "id": "top",
       "lane": "cuadernos",
       "col": 3,
-      "type": "database",
+      "type": "cloud",
       "label": "100 candidatas",
-      "sublabel": "top_candidates.gpkg",
+      "sublabel": "a entradas/candidatas/",
       "width": 114
     },
     {
@@ -170,17 +173,17 @@
       "col": 4,
       "type": "backend",
       "label": "Reporte de grillas",
-      "sublabel": "cruza fuentes y clasifica",
-      "width": 142
+      "sublabel": "lee de la bandeja y clasifica",
+      "width": 146
     },
     {
       "id": "entrega",
       "lane": "productivo",
       "col": 5,
-      "type": "messagebus",
+      "type": "cloud",
       "label": "Entrega",
-      "sublabel": "grillas_para_predios.geojson",
-      "width": 120
+      "sublabel": "a entradas/grillas/",
+      "width": 112
     }
   ],
   "edges": [
@@ -236,7 +239,7 @@
       "title": "Dónde está la frontera",
       "items": [
         "Cuadernos exploratorios, pipeline productivo; la costura es top_candidates.gpkg",
-        "reporte/datos.py falla en seco: «Corre antes el notebook 1»"
+        "Esa costura viaja por la bandeja del bucket, no por el disco de nadie"
       ]
     },
     {
