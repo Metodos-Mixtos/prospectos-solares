@@ -166,3 +166,7 @@ docs/*Notas de*
 docs/CONTINUIDAD.md
 docs/pasos-a-seguir.md
 
+# Artefactos de la verificacion de los diagramas: capturas y recibos que genera
+# visual-check. El diagrama entregado si va; su evidencia de prueba no.
+*.visual-check.*
+

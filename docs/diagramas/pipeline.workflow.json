@@ -114,10 +114,10 @@
       "id": "grillas_in",
       "lane": "insumo",
       "col": 0,
-      "type": "frontend",
-      "label": "Grillas",
-      "sublabel": "GeoJSON con cell_id",
-      "width": 106
+      "type": "cloud",
+      "label": "Bandeja",
+      "sublabel": "entradas/grillas o ruta local",
+      "width": 124
     },
     {
       "id": "fuentes",
@@ -134,8 +134,8 @@
       "col": 0,
       "type": "security",
       "label": "0 · Verificar",
-      "sublabel": "insumos, .env y bucket",
-      "width": 106
+      "sublabel": "baja capas base y verifica",
+      "width": 112
     },
     {
       "id": "paso1",
@@ -262,8 +262,8 @@
       "dot": "emerald",
       "title": "Un solo camino",
       "items": [
-        "Un punto de entrada: ejecutar.py --corrida <nombre> --grillas <archivo>",
-        "El nombre de la corrida fija los tres destinos; --desde 5 rehace el visor sin repetir lo caro"
+        "Un punto de entrada: ejecutar.py --corrida <nombre> --grillas ultima",
+        "El insumo sale de la bandeja del bucket; ninguna ruta local hace falta"
       ]
     },
     {
