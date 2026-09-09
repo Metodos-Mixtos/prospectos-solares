@@ -23,7 +23,8 @@ Métodos Mixtos Consultores.
 7. [Qué no está en el repositorio](#qué-no-está-en-el-repositorio)
 8. [Qué se reproduce igual y qué no](#qué-se-reproduce-igual-y-qué-no)
 9. [Cuando algo falla](#cuando-algo-falla)
-10. [Documentación](#documentación)
+10. [Regenerar los diagramas](#regenerar-los-diagramas)
+11. [Documentación](#documentación)
 
 ---
 
@@ -45,8 +46,7 @@ completo y se abren en el navegador sin instalar nada:
 
 > **Si cambia el flujo, hay que regenerarlos.** Un diagrama viejo miente con más autoridad
 > que un texto viejo, porque nadie lo pone en duda. Los `.workflow.json` de esa carpeta son
-> la fuente; se regeneran con el skill `archify`, que valida la composición y comprueba el
-> resultado en un navegador antes de dar el HTML por bueno.
+> la fuente. Cómo se regeneran está al final, en [Regenerar los diagramas](#regenerar-los-diagramas).
 
 **La costura entre etapas es un archivo.** La etapa 1 deja `top_candidates.gpkg`; sin él,
 `reporte/datos.py` se detiene y lo dice. Los cuadernos son exploratorios; de la etapa 2 en
@@ -246,7 +246,7 @@ celda que no está entre las 100 candidatas:
 ejecutar.py --corrida <nombre> --desde 5     rehace el visor en minutos
 python -m reporte_predios                    solo el visor, suelto
 python -m insumos bajar                      traer insumos del bucket
-python soporteandeja.py ls                 ver qué hay en la bandeja
+python soporte\bandeja.py ls                 ver qué hay en la bandeja
 ```
 
 ### Cómo se llaman entre sí
@@ -473,6 +473,41 @@ bajó y cuándo, que es lo que permite comparar dos corridas sabiendo qué se mo
 Cada corrida deja dos ficheros que dicen exactamente qué pasó:
 `outputs/corridas/<corrida>/_corrida.json`, el manifiesto con tiempos y resultados de cada
 paso, y `_corrida.log`, la salida completa.
+
+---
+
+## Regenerar los diagramas
+
+Los diagramas se hacen con **archify**, una herramienta de terceros que no forma parte del
+proyecto y por eso no está en el repositorio: se instala en la máquina, una vez. Necesita
+Node.
+
+```bash
+winget install OpenJS.NodeJS.LTS --scope user     # si no hay Node
+npx skills add tt-a1i/archify -g                  # queda en ~/.agents/skills/archify
+```
+
+Después, cada diagrama se rehace desde su `.workflow.json`, que es la fuente y sí está
+versionado:
+
+```bash
+set A=%USERPROFILE%\.agents\skills\archify
+
+node %A%\bin\archify.mjs deliver workflow ^
+     docs\diagramas\pipeline.workflow.json docs\diagramas\pipeline.html ^
+     --quality showcase
+
+node %A%\bin\archify.mjs visual-check docs\diagramas\pipeline.html
+```
+
+`deliver` valida la composición y solo escribe el HTML si pasa las nueve comprobaciones del
+perfil showcase. `visual-check` abre el resultado en un Chrome de verdad y mide que quepa y
+se lea a 1440x900, 1600x1000, 1920x1080 y 2048x1320. Un diagrama que no pase las dos no se
+sube.
+
+`visual-check` deja capturas y recibos al lado del HTML. **No se versionan**, están
+bloqueados en el `.gitignore`: el diagrama entregado va al repositorio, su evidencia de
+prueba no.
 
 ---
 
