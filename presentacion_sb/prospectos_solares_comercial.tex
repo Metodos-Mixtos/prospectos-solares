@@ -1,0 +1,358 @@
+% Prospectos Solares. Presentacion comercial.
+%
+% Version comercial. Vende el SERVICIO de prospeccion, no los lotes de una
+% corrida concreta. Publico: un desarrollador o un inversionista que conoce el
+% sector. Que sepa que es la irradiacion se da por hecho.
+%
+% Comparte estilo.tex y las figuras con la version tecnica, de modo que las dos
+% se ven como un mismo producto y una correccion de sistema alcanza a las dos.
+%
+% Regla de redaccion de ESTA version: nada de umbrales, percentiles, nombres de
+% capa, recuentos de una corrida ni jerga de metodo. Y poco texto: la lamina
+% ensena, el expositor cuenta. Lo que el cliente necesita saber es que problema
+% se le resuelve, como se le resuelve y que recibe.
+%
+% Compilar desde presentacion_sb/:
+%   pdflatex -output-directory=../outputs/presentacion_sb/build prospectos_solares_comercial.tex
+%   pdflatex -output-directory=../outputs/presentacion_sb/build prospectos_solares_comercial.tex
+%   python verificar.py ../outputs/presentacion_sb/build/prospectos_solares_comercial.pdf
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish, es-nodecimaldot]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, calc}
+\usepackage{xcolor}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\arraystretch}{1.25}
+
+\graphicspath{%
+  {../outputs/presentacion_sb/figuras/}%
+  {../outputs/presentacion_sb/capturas/}}
+\input{estilo.tex}
+
+% Los dos reportes se abren desde la propia lamina. El enlace es relativo: el PDF
+% y los dos html viven en entregables/, de modo que funciona desde cualquier
+% equipo mientras la carpeta viaje entera.
+\hypersetup{colorlinks=true, urlcolor=acento, linkcolor=acento}
+
+\makeatletter
+\long\def\@textcolor#1#2#3{\protect\leavevmode{\color#1{#2}#3}}
+\makeatother
+
+\begin{document}
+
+% ============================================================ 1. PORTADA
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=east, inner sep=0pt]
+      at ($(current page.east) - (0.55cm, 0)$)
+      {\includegraphics[height=0.94\paperheight]{fig_mapa_portada.pdf}};
+  \end{tikzpicture}%
+  \vspace{0.2em}
+  \begin{minipage}[c]{0.56\textwidth}
+    \raggedright
+    \isotipo{2.4em}\hspace{0.7em}%
+    \raisebox{0.80em}{\begin{minipage}{6cm}
+      \raggedright
+      {\large\textcolor{marca}{\textbf{MÉTODOS MIXTOS}}}\\[0.1em]{\scriptsize\textcolor{tinta3}{C\,O\,N\,S\,U\,L\,T\,O\,R\,E\,S}}
+    \end{minipage}}
+
+    \vspace{1.1em}
+    {\fontsize{26}{30}\selectfont\textcolor{tinta}{\textbf{Prospectos Solares}}}\\[0.45em]
+    {\normalsize\textcolor{tinta2}{Encontramos los lotes donde cabe un proyecto solar\\
+     y los entregamos medidos.}}
+
+    \vspace{1.1em}
+    \reglamarca
+
+    \vspace{1.6em}
+    {\small\textcolor{tinta}{Propuesta de servicio}}\\[0.55em]
+    {\footnotesize\textcolor{tinta2}{Daniel Wiesner $\cdot$ Susana Yepes $\cdot$ Samuel Blanco}}\\[0.35em]
+    {\scriptsize\textcolor{tinta3}{MÉTODOS MIXTOS CONSULTORES}}
+  \end{minipage}
+\end{frame}
+
+% ============================================================ EL PROBLEMA
+\section{El problema}
+
+% --- 2. El problema, entero en una lamina ------------------------------------
+% Eran dos: la de las cuatro condiciones y la de las tres entidades. Separadas,
+% la primera enunciaba el problema y la segunda lo explicaba, y ninguna de las
+% dos lo hacia evidente. Juntas dicen lo que hay que decir: el dato existe, y lo
+% que no existe es el sitio donde esta reunido.
+\begin{frame}{El dato existe. Reunido, no}
+  \afirmacion{Cuatro condiciones tienen que coincidir sobre un mismo lote, y cada una la
+  publica una entidad distinta.}
+  {Ninguna responde por las demás, ninguna usa el mismo formato y ninguna comparte fecha
+  de corte.}
+
+  \vspace{1.9em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright
+    \rotuloancla[0.22\linewidth]{Terreno apto y accesible}\hfill
+    \rotuloancla[0.24\linewidth]{Capacidad libre en la red}\hfill
+    \rotuloancla[0.24\linewidth]{Un uso del suelo que lo permita}\hfill
+    \rotuloancla[0.22\linewidth]{Un dueño con quien negociar}
+  \end{minipage}
+
+  \vspace{1.9em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \bandera\small\textcolor{tinta2}{El catastro dice de quién es y cuánto mide, el
+    ordenamiento del municipio si el uso lo permite, el operador de red si hay dónde
+    conectarse.}
+  \end{minipage}
+\end{frame}
+
+% ============================================================ LA PROPUESTA
+\section{La propuesta}
+
+% --- 3 ---
+% El diagrama antes tenia los seis pasos de la version tecnica. Al cliente no le
+% importa que artefacto viaja entre uno y otro: le importa que cada tramo entrega
+% algo y que el ultimo entrega la ficha. Los tres primeros pasos son aqui una
+% sola caja, «el modelo elige donde mirar».
+\begin{frame}{Cómo trabajamos}
+  \vfill
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.66\paperheight, keepaspectratio]{fig_cadena_comercial.pdf}
+  \end{center}
+  \vfill
+\end{frame}
+
+% --- 4. La unidad de trabajo, en grande --------------------------------------
+\begin{frame}{La unidad de trabajo}{Una celda de 5 por 5 kilómetros, medida entera y a distancia}
+  \vspace{0.2em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.62\paperheight, keepaspectratio]{fig_grilla_ancha.pdf}
+  \end{center}
+\end{frame}
+
+% --- 5. Que se le mide a cada celda -----------------------------------------
+% Estaba en cuatro columnas de 1, 3, 2 y 1 elementos: el terreno ocupaba el
+% triple que el recurso sin que eso quiera decir nada, y los siete criterios no
+% se leian como siete. Ahora es una rejilla de cuatro por dos, un criterio por
+% tarjeta y el resultado en la octava casilla.
+%
+% «Cobertura del suelo» y no «Cobertura apta del suelo». El agregado sigue
+% existiendo en el reporte de celdas, de modo que el nombre largo no seria falso
+% aqui, pero el cliente no lo va a encontrar en el reporte de lotes: alli se
+% retiro el 26 de agosto y la cobertura se reporta clase a clase. La nota al pie
+% dice exactamente eso, para que la lamina no prometa una variable que el
+% entregable ya no tiene con ese nombre.
+\begin{frame}{Qué se le mide a cada celda}
+  \vspace{0.1em}
+  \centerline{\includegraphics[width=\textwidth, height=0.665\paperheight, keepaspectratio]{fig_criterios_celda.pdf}}
+  \fuente{En la celda, la cobertura entra como un solo porcentaje de suelo apto. En la
+  ficha del lote se reporta clase por clase, con la cifra de cada una y sin combinarlas.}
+\end{frame}
+
+% ============================================================ EL RESULTADO
+\section{El resultado}
+
+% --- 6 ---
+\begin{frame}{Dónde mirar primero}{Las cien celdas mejor calificadas, sobre la red de transmisión}
+  \vspace{-2.3em}
+  \begin{minipage}[t]{0.705\textwidth}
+    \vspace{0pt}
+    \centering
+    \includegraphics[width=\linewidth, height=0.755\paperheight, keepaspectratio]{fig_mapa.pdf}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.265\textwidth}
+    \vspace{1.8em}
+    \bandera\footnotesize\textcolor{tinta2}{Las candidatas no se reparten por el país:
+    siguen la red. Donde no hay línea cerca no hay nada que conectar, por bueno que sea
+    el terreno.
+
+    \vspace{0.9em}
+    La nota compara cada celda con los terrenos donde ya hay planta. Dónde se pone el
+    corte, un 70 por ejemplo, se decide con el cliente y cambia la lista.}
+  \end{minipage}
+\end{frame}
+
+% --- 7 ---
+% Figura propia de esta version, no la compartida con el guion tecnico. Aquella
+% mete ademas la hoja entera a 2,15 cm de ancho, que a ese tamano no se lee y
+% ademas se come una quinta parte del ancho. Fuera esa, las dos piezas graficas
+% crecen de 5,8 y 3,2 cm a 8,4 y 4,6 cm.
+\begin{frame}{Cada celda llega medida}{Una ficha por celda, con lo que decide si vale la pena bajar al catastro}
+  \vspace{0.1em}
+  \centerline{\includegraphics[width=\textwidth, height=0.60\paperheight, keepaspectratio]{fig_ficha_celda_comercial.pdf}}
+  \fuente{Celda 0008656, Montería, vereda La Manta: prioritaria, índice 75 de 100. La hoja
+  sigue con la aptitud de la celda y sus siete criterios, la potencia estimada, la
+  cobertura, el recurso solar, el entorno, la conexión a la red y las restricciones.}
+\end{frame}
+
+% --- 8. De la celda al lote -------------------------------------------------
+% Viene de la version tecnica. Es la lamina que ensena el salto de escala sin
+% una sola cifra: a la izquierda lo que publica el catastro, a la derecha lo
+% mismo ya clasificado.
+\begin{frame}{Dentro de la celda, el catastro}{Se bajan todos los lotes y cada uno recibe sus propios valores}
+  \begin{minipage}[t]{0.492\textwidth}
+    \vspace{0pt}\centering
+    \includegraphics[width=\linewidth, height=0.475\paperheight, keepaspectratio]{fig_catastro_celda.pdf}\\[0.4em]
+    {\scriptsize\textcolor{tinta3}{Lo que baja del catastro}}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.492\textwidth}
+    \vspace{0pt}\centering
+    \includegraphics[width=\linewidth, height=0.475\paperheight, keepaspectratio]{fig_catastro_clasificado.pdf}\\[0.4em]
+    {\scriptsize\textcolor{tinta3}{Los mismos lotes, ya clasificados}}
+  \end{minipage}
+  \fuente{Celda 0010961, La Unión, Sucre. Azul idóneo, ámbar con gestión, rojo no viable.}
+\end{frame}
+
+% --- 9 ---
+\begin{frame}{Usted pone las condiciones}{Se filtra como en una hoja de cálculo, y la lista se rehace a la vista}
+  \vspace{0.3em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.505\paperheight, keepaspectratio]{fig_filtro_cliente.pdf}
+  \end{center}
+  \vspace{0.2em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \bandera\footnotesize\textcolor{tinta2}{Los diez de arriba son una muestra: el visor
+    trae setenta y cinco criterios y ninguno trae el umbral puesto. Solo son fijos el mínimo
+    de dos hectáreas y las exclusiones de entrada, y cada lote que cae por ahí va en la lista
+    de descartes con su motivo.}
+  \end{minipage}
+\end{frame}
+
+% --- 10 ---
+\begin{frame}{Y clasificado por lo que le falta}{No es una lista de terrenos buenos: es una lista con el siguiente paso escrito}
+  \vspace{0.3em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.535\paperheight, keepaspectratio]{fig_clases_lote.pdf}
+  \end{center}
+  \fuente{El Instituto Geográfico Agustín Codazzi no publica la zonificación rural de cuatro
+  de cada diez lotes, ni de más de la mitad de los Idóneos: ahí decide el certificado de uso
+  del suelo que expide el municipio.}
+\end{frame}
+
+% --- 11 y 12. Lo que trae la ficha del lote ---------------------------------
+% La pregunta que el cliente hace siempre es que informacion recibe. La respuesta
+% es el indice de la ficha, entero. Una captura de la hoja A4 no sirve, porque su
+% cuerpo llega a la lamina por debajo de 3 pt.
+%
+% Van DOS laminas y no una. En una sola, a cuatro por cuatro, la tarjeta quedaba
+% en 3,2 por 1,5 cm y el texto se salia de seis de ellas: no es un defecto de
+% ajuste, es que diecisiete rotulos con su descripcion no caben en una hoja de
+% 16 por 9. Partidas, la tarjeta pasa a 4,3 por 1,9 cm y el texto entra medido.
+%
+% Diecisiete y no dieciseis: comprobado el 2 de septiembre de 2026 sobre la ficha
+% real, contando los h2 que compone el visor. La decimosexta es la del
+% certificado de tradicion y solo sale cuando el folio ya esta leido, y eso lo
+% dice el subtitulo de la primera de las dos.
+\begin{frame}{Todo lo que trae la ficha de un lote}{Dieciséis secciones en una página imprimible, y una más cuando el certificado ya está leído}
+  \vspace{0.1em}
+  \centerline{\includegraphics[width=\textwidth, height=0.665\paperheight, keepaspectratio]{fig_ficha_completa_1.pdf}}
+\end{frame}
+
+\begin{frame}{Todo lo que trae la ficha de un lote}{De la norma urbanística a la ruta de compra}
+  \vspace{0.1em}
+  \centerline{\includegraphics[width=\textwidth, height=0.665\paperheight, keepaspectratio]{fig_ficha_completa_2.pdf}}
+\end{frame}
+
+% --- 13 ---
+% El camino juridico es el diferenciador comercial: casi nadie lo entrega. Estaba
+% con el quinto eslabon marcado como en desarrollo y ya no lo esta: al 2 de
+% septiembre de 2026 funciona de punta a punta y esta probado sobre el folio
+% 366-35594, de cinco paginas y doce anotaciones.
+%
+% Figura propia de esta version. La compartida con el guion tecnico sigue
+% marcando el quinto eslabon como pendiente, y ese guion no se toca aqui.
+%
+% Cifras: el certificado a 23.000 pesos y la Resolucion 2026-001726 del 29 de
+% enero de 2026 salen de outputs/COSTO_IA_CERTIFICADOS.md, que las verifico
+% contra la resolucion; los 129 pesos y los 22.477 tokens son la medicion de esa
+% misma nota sobre el folio real; los diez dias habiles, de docs/PREDIOS.md; los
+% once riesgos, de la lista RIESGOS de predios/certificados.py.
+\begin{frame}{Hasta el dueño y el folio}{Del código del catastro al certificado de tradición leído}
+  \vspace{0.3em}
+  \centerline{\includegraphics[width=\textwidth, height=0.53\paperheight, keepaspectratio]{fig_cadena_registro_comercial.pdf}}
+  \fuente{La petición de matrículas no tiene costo y se responde en diez días hábiles. El
+  certificado de tradición cuesta 23.000 pesos por lote, según la Resolución 2026-001726
+  de la Superintendencia de Notariado y Registro, del 29 de enero de 2026, y por eso solo
+  se compra sobre la lista ya filtrada. Leerlo cuesta unos 129 pesos, medidos sobre un
+  folio real de cinco páginas y doce anotaciones, y un certificado ya leído no se vuelve a
+  analizar. El modelo corre en el proyecto de Google Cloud de la firma.}
+\end{frame}
+
+% --- 14 ---
+\begin{frame}{Qué recibe}{Tres entregables, y el procedimiento documentado para repetirlo}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \bandera\footnotesize\textcolor{tinta2}{Todo llega como páginas web que se abren sin
+    instalar nada y sin depender de nosotros.}
+  \end{minipage}
+
+  \vspace{0.6em}
+  \begin{tikzpicture}[x=1cm, y=1cm]
+    \node[cajarot=3.85cm, minimum height=2.85cm] (a) at (0, 0)
+      {\cajatexto{Mapa del país}{Las celdas calificadas}{Las cien celdas candidatas, con
+       su calificación y el motivo escrito. Se filtra y se descarga la selección.}};
+    \node[cajarot=3.85cm, minimum height=2.85cm] (b) at (4.72, 0)
+      {\cajatexto{Visor de lotes}{La lista corta}{Cada lote sobre imagen satelital, con
+       sus medidas, su clase y los filtros en sus manos.}};
+    \node[cajarot=3.85cm, minimum height=2.85cm] (c) at (9.44, 0)
+      {\cajatexto{Ficha por lote}{El expediente}{Una página imprimible por lote, con lo
+       que hay que gestionar y ante qué entidad.}};
+  \end{tikzpicture}
+
+  \vspace{0.7em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    {\footnotesize\textcolor{tinta2}{Abrir ahora:
+    \href{reporte_grillas.html}{\textbf{reporte de celdas}} $\cdot$
+    \href{reporte_predios.html}{\textbf{visor de lotes}}}}
+  \end{minipage}
+\end{frame}
+
+% ============================================================ CIERRE
+\section{Cómo empezamos}
+
+% --- 15 ---
+% La columna derecha decia «Lo que entregamos primero: el mapa del pais con las
+% zonas calificadas. Sobre el usted marca donde bajar al detalle. Nada sustituye
+% la verificacion en campo». Vendia menos de lo que el producto hace: no hace
+% falta que el cliente marque nada primero, y el mapa no es una entrega parcial a
+% la espera de instrucciones. Con que diga sus condiciones de filtrado se le
+% entrega el reporte entero, que es lo que se acaba de ensenar en once laminas.
+%
+% La salvaguarda de la verificacion en campo se queda, porque es cierta, pero
+% baja al pie: puesta como tercer renglon de la columna parecia la conclusion de
+% la lamina, y la conclusion es la entrega.
+\begin{frame}{Cómo empezamos}
+  \vspace{0.6em}
+  \begin{minipage}[t]{0.47\textwidth}
+    \raggedright
+    \rotulo[acento]{Lo que necesitamos de usted}\\[0.7em]{\footnotesize\textcolor{tinta2}{La escala del proyecto que busca.\\[0.30em]
+    Las zonas del país que le interesan.\\[0.30em]
+    Sus condiciones de descarte, si ya las tiene.}}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.47\textwidth}
+    \raggedright
+    \rotulo[acento2]{Lo que entregamos}\\[0.7em]{\footnotesize\textcolor{tinta2}{El mapa del país con las zonas calificadas,\\[0.30em]
+    la lista corta de lotes y la ficha de cada uno.\\[0.30em]
+    Suyos, para usarlos cuando quiera y sin nosotros.}}
+  \end{minipage}
+
+  \vspace{1.5em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \filete\\[0.9em]
+    {\small\textcolor{tinta}{\textbf{Díganos qué busca y le entregamos el país ya consultado, lote por lote.}}}\\[0.45em]
+    {\footnotesize\textcolor{tinta2}{Métodos Mixtos Consultores $\cdot$ Véalos funcionando:
+    \href{reporte_grillas.html}{\textbf{reporte de celdas}} $\cdot$
+    \href{reporte_predios.html}{\textbf{visor de lotes}}}}
+  \end{minipage}
+
+  \vspace{0.9em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \fuente{El trabajo se hace sobre cartografía y registros públicos: nada de lo que
+    entregamos sustituye la verificación en campo.}
+  \end{minipage}
+\end{frame}
+
+\end{document}

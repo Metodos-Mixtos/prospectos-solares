@@ -61,9 +61,12 @@ SALIDA = config.PROJECT_ROOT / "outputs" / "reporte"
 # Los tres umbrales de cada criterio se leen de la distribución de las celdas del país
 # que ya contienen una planta solar de 10 MW o más, que es la escala que se prospecta.
 #
-#     tope   = percentil 10   el decil mejor de lo construido, vale 100
-#     bueno  = mediana        donde está la mitad de lo construido, vale 70
-#     limite = percentil 90   más allá casi nadie ha construido, vale 0
+#     tope   = el decil mejor de lo construido, vale 100
+#     bueno  = la mediana, donde está la mitad de lo construido, vale 70
+#     limite = el decil peor de lo construido, vale 0
+#
+# Cuál percentil es cuál depende del sentido del criterio: donde menos es mejor,
+# tope es el percentil 10 y límite el 90; donde más es mejor se voltea.
 #
 # Se derivan con REFERENCIA_SCRIPT y se pegan aquí en vez de calcularse en cada corrida,
 # porque calcularlos al vuelo obligaría a consultar Overpass y a leer el panel completo
@@ -76,7 +79,7 @@ REFERENCIA_N = 53
 REFERENCIA_MW = 10
 REFERENCIA_SCRIPT = "python -m soporte.calibracion umbrales"
 
-# El peso de cada criterio es su d de Cohen dividida por la suma de las seis.
+# El peso de cada criterio es su d de Cohen dividida por la suma de las siete.
 #
 # La d compara las celdas con planta contra el resto de las 7.239 que están dentro del
 # radio de una subestación, y no contra las 21.447 del panel. La diferencia no es menor:
@@ -178,7 +181,7 @@ CRITERIOS = {
         # Medida, ya no estimada. Como la variable no está en el panel, hubo que
         # consultar Overpass celda por celda: 24 con planta contra 96 sin planta dentro
         # del buffer, con medias de 0,56 y 1,30 km. La muestra es la más pequeña de las
-        # seis porque Overpass rechazó parte de los lotes.
+        # siete porque Overpass rechazó parte de los lotes.
         "d_cohen": 0.53,
         "por_que": "condiciona el acceso de equipos pesados durante la obra",
     },
@@ -252,6 +255,18 @@ PERFILES = {
             # del proyecto, que es lo que de verdad decide si cabe.
             "capacidad": {"tope": 200.0,  "bueno": 100.0,  "limite": 50.0},
         },
+        # Umbrales medidos en los lotes catastrales de las plantas de XM (corte
+        # 18-ago-2026, catastro 06_2026): percentiles 10/50/90 de 40 lotes de
+        # referencia (26 huellas aproximadas). Los usa predios/lotes.py
+        # (escala "lote"); recurso y capacidad conservan la escala de grilla.
+        "umbrales_lote": {
+            "dist_sub": {"tope": 3.5, "bueno": 6.3, "limite": 28.9},
+            "cobertura": {"tope": 89.0, "bueno": 62.0, "limite": 20.0},
+            "pendiente": {"tope": 1.4, "bueno": 5.0, "limite": 14.1},
+            "recurso": {"tope": 1629.0, "bueno": 1629.0, "limite": 1512.0},
+            "rugosidad": {"tope": 1.3, "bueno": 5.9, "limite": 24.1},
+            "dist_via": {"tope": 0.0, "bueno": 0.0, "limite": 1.4},
+        },
     },
     "distribuida": {
         "etiqueta": "Generación distribuida, 1 a 2 MWp",
@@ -275,6 +290,18 @@ PERFILES = {
             "dist_via":  {"tope": 0.1,    "bueno": 0.6,    "limite": 2.8},
             "capacidad": {"tope": 20.0,   "bueno": 6.0,    "limite": 2.0},
         },
+        # Umbrales medidos en los lotes catastrales de las plantas de XM (corte
+        # 18-ago-2026, catastro 06_2026): percentiles 10/50/90 de 62 lotes de
+        # referencia (0 huellas aproximadas). Los usa predios/lotes.py
+        # (escala "lote"); recurso y capacidad conservan la escala de grilla.
+        "umbrales_lote": {
+            "dist_sub": {"tope": 4.8, "bueno": 16.6, "limite": 27.7},
+            "cobertura": {"tope": 92.0, "bueno": 66.0, "limite": 15.0},
+            "pendiente": {"tope": 1.1, "bueno": 3.5, "limite": 21.8},
+            "recurso": {"tope": 1641.0, "bueno": 1551.0, "limite": 1426.0},
+            "rugosidad": {"tope": 1.4, "bueno": 6.5, "limite": 72.1},
+            "dist_via": {"tope": 0.0, "bueno": 0.1, "limite": 2.3},
+        },
         "aviso_conexion": (
             "La conexión real de un proyecto de 1 a 2 MWp es a un circuito de media "
             "tensión de 13,2 o 34,5 kV, que debe quedar a menos de 1,5 km. Esa red no "
@@ -289,19 +316,31 @@ PERFILES = {
 PERFIL_POR_DEFECTO = "utility"
 
 
-def aplicar_perfil(nombre: str) -> dict:
+def umbrales_de(nombre: str, escala: str = "grilla") -> dict:
+    """Umbrales del perfil a la escala pedida: los de grilla, o los de lote donde existan."""
+    p = PERFILES[nombre]
+    base = {k: dict(v) for k, v in p["umbrales"].items()}
+    if escala == "lote":
+        for k, v in (p.get("umbrales_lote") or {}).items():
+            base[k] = {**base.get(k, {}), **v}
+    return base
+
+
+def aplicar_perfil(nombre: str, escala: str = "grilla") -> dict:
     """
     Reescribe CRITERIOS y el rango de tensión con los valores del perfil elegido.
 
     Muta los globales a propósito, porque el resto del módulo y la plantilla del HTML
     leen de CRITERIOS. Es lo que evita tener que pasar el perfil por veinte funciones.
+    Con escala="lote" se usan los umbrales medidos en los lotes de las plantas
+    (umbrales_lote, calibrados con soporte.calibracion umbrales_lote) donde existan.
     """
     global KV_CONEXION_MIN, KV_CONEXION_MAX, REFERENCIA_N, REFERENCIA_MW, PERFIL_ACTIVO
 
     if nombre not in PERFILES:
         raise SystemExit(f"Perfil desconocido: {nombre}. Hay {', '.join(PERFILES)}")
     p = PERFILES[nombre]
-    for clave, u in p["umbrales"].items():
+    for clave, u in umbrales_de(nombre, escala).items():
         CRITERIOS[clave].update(u)
     for clave, w in p.get("pesos", {}).items():
         if clave in CRITERIOS:
@@ -371,35 +410,6 @@ EXCLUSIONES_UMBRAL = [
 #: De las diez plantas solares de 50 MW o más en operación en el país, ninguna está en un
 #: municipio que caiga bajo estos filtros.
 CONFLICTO_DESDE = 2022
-
-#: Porcentaje de la celda cubierto por Reserva Forestal de Ley 2ª a partir del cual se
-#: descarta.
-#:
-#: La reserva no prohíbe el proyecto como sí lo hace un parque nacional. Reserva el suelo
-#: para economía forestal, de modo que darle otro uso exige que el ministerio sustraiga
-#: primero esa porción del área. Ese trámite está regulado por la Resolución 110 de 2022
-#: del MADS [1], que exige que la actividad sea de utilidad pública o interés social. Un
-#: proyecto solar cumple ese requisito de entrada, porque el artículo 4 de la Ley 1715 de
-#: 2014 [2] declara de utilidad pública el desarrollo de fuentes no convencionales de
-#: energía renovable. La puerta legal existe; lo que añade es tiempo y compensaciones.
-#:
-#: Por eso el corte es de área, no de presencia. Una celda de 2.500 ha con la reserva
-#: encima del 30% deja 1.700 ha libres, y una planta de 100 MW ocupa unas 150: el lote se
-#: sitúa fuera del polígono y no hay sustracción que tramitar. Solo cuando la reserva
-#: cubre casi toda la celda no queda dónde ponerla, y ahí sí descarta.
-#:
-#: Queda un cabo suelto que el reporte no resuelve y conviene mirar en campo: la línea de
-#: conexión hasta la subestación sí puede cruzar la reserva aunque los paneles estén
-#: fuera, y para líneas de transmisión la Resolución 110 pide sustracción temporal.
-#:
-#: [1] Resolución 110 de 2022 del MADS, que derogó la Resolución 1526 de 2012 salvo sus
-#:     artículos 7 y 8 sobre términos de referencia. Fija el plazo de decisión en unos 85
-#:     días hábiles y remite las compensaciones al Manual del Medio Biótico, actualizado
-#:     por la Resolución 0305 de 2026 del MADS.
-#: [2] Artículo 4 de la Ley 1715 de 2014, en la redacción que le dio la Ley 2099 de 2021.
-#:     Ojo con el número: el artículo 3 de esa ley es el ámbito de aplicación, no la
-#:     declaratoria de utilidad pública.
-LEY2_EXCLUYE_PCT = 90.0
 
 
 def _may(texto: str) -> str:
@@ -731,48 +741,6 @@ def añadir_cobertura(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return g
 
 
-def añadir_restricciones_externas(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    """
-    Cruza las celdas con las capas de restricción que no vienen en el panel.
-
-    El cruce se hace aquí y no se lee de un CSV previo a propósito. El panel de Daniel
-    trae las cuatro figuras jurídicas ya resueltas por celda, pero la Ley 2ª no está en
-    él, y si el reporte dependiera de una tabla precalculada bastaría con que el modelo
-    devolviera otras celdas para que la tabla dejara de cubrirlas sin avisar. Cruzando
-    contra la geometría que llega, el resultado es correcto sea cual sea el conjunto.
-
-    La capa viene del bucket. Si no hay credenciales se cae a la caché local y, en
-    último término, al servicio del MADS.
-    """
-    g = g.copy()
-    try:
-        import insumos.restricciones as cr
-    except Exception as exc:
-        print(f"  restricciones externas no disponibles ({type(exc).__name__})")
-        return g
-
-    for clave in cr.CAPAS:
-        try:
-            ruta = cr.obtener_capa(clave)
-            if ruta is None:
-                continue
-            res = cr.cruzar(clave, gpd.read_file(ruta), g)
-        except Exception as exc:
-            print(f"  {clave}: no se pudo cruzar ({type(exc).__name__})")
-            continue
-        g = g.merge(res, on="cell_id", how="left")
-        for col in (f"{clave}_ha", f"{clave}_pct"):
-            if col in g.columns:
-                g[col] = g[col].fillna(0.0)
-
-    if "ley2_pct" in g.columns:
-        tocadas = int((g["ley2_pct"] > 0).sum())
-        fuera = int((g["ley2_pct"] >= LEY2_EXCLUYE_PCT).sum())
-        print(f"  Ley 2ª: {tocadas} celdas tocadas, {fuera} por encima del "
-              f"{LEY2_EXCLUYE_PCT:.0f}% que descarta")
-    return g
-
-
 def añadir_capacidad_barra(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     """
     Capacidad libre de la barra a la que se conectaría cada grilla.
@@ -781,9 +749,10 @@ def añadir_capacidad_barra(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     porque son puntos de conexión distintos: un proyecto de 1 a 2 MW entra por un
     circuito de 13,2 o 34,5 kV y uno de 50 MW por la barra de 110.
 
-    El dato viene de los catorce informes de capacidad por barra de la UPME, ciclo
-    2023-2024. Es el techo físico del nodo, no el cupo libre a día de hoy: para
-    comprometer una conexión hay que confirmarlo con el operador de red.
+    El dato viene de la Circular UPME 054 de 2026 (capacidad por barra 2026-2039), que
+    prevalece sobre los catorce informes del ciclo 2023-2024 donde exista la barra
+    (`insumos.barras.extraer_todas`). Es capacidad bajo escenario crítico, no el cupo que
+    se firma: para comprometer una conexión hay que radicar la solicitud.
     """
     g = g.copy()
     g["capacidad_barra_mw"] = np.nan
@@ -1000,7 +969,7 @@ def añadir_vias(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     Lo importante es el segundo paso. Antes, si el CSV no cubría una celda, la columna
     quedaba vacía y el criterio simplemente desaparecía del índice de esa celda sin que
-    nada lo advirtiera: se comparaba con cinco criterios contra las que tenían seis.
+    nada lo advirtiera: se comparaba con seis criterios contra las que tenían siete.
     Ahora se completa lo que falte, y solo se rinde si Overpass no responde.
     """
     g = g.copy()
@@ -1044,16 +1013,18 @@ def clasificar(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     Se evalúa en este orden y el primero que aplica manda:
 
-      Descartada   cae sobre una figura jurídica excluyente. No compite, sale.
-      Con reparos  sin restricción jurídica, pero la pendiente supera los 10° o la
-                   subestación queda a más de 30 km. Cualquiera de las dos basta.
-      Preferente   pendiente por debajo de 5° y subestación a 15 km o menos. Se
-                   exigen las dos a la vez.
-      Viable       el resto. Sin reparos, pero corta en pendiente o en distancia.
+      Excluida      cae sobre una restricción excluyente: figura jurídica, altitud de
+                    páramo, coca o conflicto armado. No compite.
+      Condicionada  sin restricción excluyente, pero al menos uno de los criterios de
+                    CRITERIOS queda fuera de su límite. Basta con uno.
+      Prioritaria   ningún criterio fuera de límite y un índice de INDICE_PRIORITARIA
+                    o más.
+      Elegible      el resto. Ningún criterio fuera de límite, pero el índice queda
+                    por debajo del corte.
 
-    Solo tres variables clasifican: figura jurídica, pendiente y distancia al punto
-    de conexión. Todo lo demás que trae el reporte (elevación, temperatura, cobertura
-    del suelo, densidad de población) es contexto para leer la celda, no criterio.
+    Clasifican las restricciones excluyentes y los siete criterios de CRITERIOS. Lo
+    demás que trae el reporte (elevación, temperatura, privación relativa, densidad de
+    población) es contexto para leer la celda, no criterio.
     """
     g = g.copy()
 
@@ -1090,20 +1061,6 @@ def clasificar(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
                     f"desde {CONFLICTO_DESDE} ({dens:.0f} por mil km²)"
                 )
 
-    # Ley 2ª. Descarta solo si cubre la celda casi entera, porque con cobertura parcial
-    # el proyecto se sitúa fuera del polígono y no hay sustracción que tramitar.
-    if "ley2_pct" in g.columns:
-        for i, pct in enumerate(g["ley2_pct"].fillna(0).values):
-            if pct >= LEY2_EXCLUYE_PCT:
-                detalle[i].append(
-                    f"Reserva Forestal de Ley 2ª de 1959 sobre el {pct:.0f}% de la celda"
-                )
-
-    g["ley2_parcial"] = (
-        (g["ley2_pct"].fillna(0) > 0) & (g["ley2_pct"].fillna(0) < LEY2_EXCLUYE_PCT)
-        if "ley2_pct" in g.columns else False
-    )
-
     g["restricciones"] = [_may("; ".join(d)) if d else "Sin restricción registrada"
                           for d in detalle]
     g["n_restricciones"] = [len(d) for d in detalle]
@@ -1124,9 +1081,13 @@ def clasificar(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     }
 
     def fmt(clave, v):
+        # El motivo se lee en español, así que la coma es el separador decimal y el
+        # punto el de millar. Escrito al revés, "1.443 kWh/kWp" se leería como mil
+        # cuatrocientos cuarenta y tres y "28.5 MW" como veintiocho mil quinientos.
         u = CRITERIOS[clave]["unidad"]
         dec = 0 if u in ("kWh/kWp", "%") else 1
-        return f"{v:.{dec}f}{'' if u == '°' else ' '}{u}"
+        cifra = f"{v:,.{dec}f}".translate(str.maketrans({",": ".", ".": ","}))
+        return f"{cifra}{'' if u == '°' else ' '}{u}"
 
     def utilidad(clave, v):
         """
@@ -1192,36 +1153,32 @@ def clasificar(g: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         indices.append(indice)
         cumples.append(len(ok))
 
-        # La reserva parcial no cambia de clase, pero tiene que quedar escrita: el lote
-        # se puede sitiar fuera del polígono, y quien lea la ficha debe saberlo antes de
-        # salir a mirar predios.
-        nota = ""
-        if bool(g["ley2_parcial"].iloc[i]):
-            nota = (f" El {g['ley2_pct'].iloc[i]:.0f}% de la celda está en Reserva "
-                    f"Forestal de Ley 2ª: el lote debe quedar fuera del polígono o "
-                    f"habría que tramitar sustracción ante el MADS.")
-
         # El índice resume, pero no puede tapar un criterio fuera de límite: una celda
         # excelente en cinco cosas y con la subestación a 40 km sigue siendo un problema.
         if bajo_limite:
             clases.append("Condicionada")
             motivos.append(
-                f"Índice {indice:.0f} sobre 100. Requiere gestión adicional por "
-                + "; y ".join(bajo_limite) + "." + nota
+                f"Índice {indice:.0f} sobre 100, con {len(bajo_limite)} "
+                + ("criterio fuera de límite" if len(bajo_limite) == 1
+                   else "criterios fuera de límite")
+                + ". Requiere gestión adicional por "
+                + "; y ".join(bajo_limite) + "."
             )
         elif indice >= INDICE_PRIORITARIA:
             clases.append("Prioritaria")
             motivos.append(
-                f"Índice {indice:.0f} sobre 100, cumpliendo {len(ok)} de "
-                f"{len(CRITERIOS)} criterios. Entra en la lista corta." + nota
+                f"Índice {indice:.0f} sobre 100 y ningún criterio fuera de límite. "
+                f"Alcanza el objetivo en {len(ok)} de {len(CRITERIOS)} criterios. "
+                f"Entra en la lista corta."
             )
         else:
             clases.append("Elegible")
             detalle_corto = (" Por debajo del objetivo en " + " y ".join(cortos) + "."
                              if cortos else "")
             motivos.append(
-                f"Índice {indice:.0f} sobre 100. Cumple {len(ok)} de "
-                f"{len(CRITERIOS)} criterios.{detalle_corto}" + nota
+                f"Índice {indice:.0f} sobre 100, sin criterios fuera de límite, pero por "
+                f"debajo del corte de {INDICE_PRIORITARIA:.0f}. Alcanza el objetivo en "
+                f"{len(ok)} de {len(CRITERIOS)} criterios.{detalle_corto}"
             )
 
     g["clasificacion"] = clases
@@ -1377,7 +1334,6 @@ def main(argv=None) -> int:
     print(f"  distancia a vía          : {n_via} con dato"
           + ("" if n_via else "  (corre distancia_vias.py)"))
     g = añadir_cobertura(g)
-    g = añadir_restricciones_externas(g)
     g = añadir_conflicto(g)
     g = añadir_capacidad_barra(g)
     g = clasificar(g)
@@ -1389,7 +1345,10 @@ def main(argv=None) -> int:
     # por él dejaba de primera a una celda con índice 47,9 y de puesto 83 a la mejor de
     # la cartera, así que el reporte se contradecía consigo mismo. Se desempata con
     # sim_score, que para eso sí sirve.
-    g = g.sort_values(["indice_aptitud", "sim_score"], ascending=False).reset_index(drop=True)
+    # sim_score solo existe si las celdas vienen del modelo de similitud. Una celda
+    # tomada del panel no lo trae, y exigirlo rompia el reporte.
+    orden = [c for c in ("indice_aptitud", "sim_score") if c in g.columns]
+    g = g.sort_values(orden, ascending=False).reset_index(drop=True)
     g.insert(0, "ranking", range(1, len(g) + 1))
 
     g = añadir_zonas(g)
@@ -1407,7 +1366,6 @@ def main(argv=None) -> int:
         ("sim_score", "Puntaje de similitud"),
         ("clasificacion", "Clasificación"),
         ("cobertura_apta_pct", "Cobertura apta (%)"),
-        ("ley2_pct", "Reserva Ley 2ª (% de la celda)"),
         ("conf_eventos", "Acciones bélicas en el municipio"),
         ("conf_densidad", "Acciones bélicas por mil km²"),
         ("conf_actores", "Actores armados registrados"),
@@ -1530,7 +1488,7 @@ def main(argv=None) -> int:
         registros.append({
             "ranking": int(row["ranking"]),
             "id": str(row["cell_id"]),
-            "score": round(float(row["sim_score"]), 4),
+            "score": round(float(row["sim_score"]), 4) if "sim_score" in row else None,
             "clase": row["clasificacion"],
             "motivo": row["motivo"],
             "depto": row.get("departamento") or "Sin dato",
@@ -1539,7 +1497,7 @@ def main(argv=None) -> int:
             "sub_municipio": row.get("sub_municipio") or "Sin dato",
             "restricciones": row["restricciones"],
             "n_restric": int(row["n_restricciones"]),
-            # Los valores de los seis criterios se exportan con el mismo redondeo con el
+            # Los valores de los siete criterios se exportan con el mismo redondeo con el
             # que clasificar() los usa. Si el JSON manda más decimales, el navegador
             # recalcula el índice sobre otros números y aparecen diferencias de una
             # décima que rompen el orden del ranking sin que nada esté mal de fondo.
@@ -1551,7 +1509,6 @@ def main(argv=None) -> int:
             "temp": round(float(row["temp"]), 1) if pd.notna(row.get("temp")) else None,
             "pendiente": round(float(row["slope_mean"]), 1) if pd.notna(row.get("slope_mean")) else None,
             "cobertura": round(float(row["cobertura_apta_pct"]), 1) if pd.notna(row.get("cobertura_apta_pct")) else None,
-            "ley2": round(float(row["ley2_pct"]), 1) if pd.notna(row.get("ley2_pct")) else 0.0,
             "conf_n": int(row.get("conf_eventos") or 0),
             "conf_d": round(float(row.get("conf_densidad") or 0), 1),
             "conf_act": row.get("conf_actores") or "",

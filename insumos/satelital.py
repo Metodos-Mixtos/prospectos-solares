@@ -22,6 +22,7 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import time
 import warnings
@@ -43,7 +44,7 @@ PREFIJO = "insumos/satelital"
 
 SERVICIO = ("https://services.arcgisonline.com/ArcGIS/rest/services/"
             "World_Imagery/MapServer/export")
-ATRIBUCION = "Esri World Imagery · Maxar, Earthstar Geographics"
+ATRIBUCION = "Esri World Imagery · Vantor (antes Maxar), Earthstar Geographics"
 
 #: Margen alrededor de la grilla, en fracción de su lado. Con un 15% se ve el borde
 #: inmediato sin gastar la mitad de los píxeles en terreno que no es la grilla.
@@ -94,11 +95,67 @@ def recuadro(geom, margen: float = MARGEN):
     return (minx - dx, miny - dy, maxx + dx, maxy + dy)
 
 
+_REMOTOS: set[str] | None = None
+
+
+def _en_bucket(nombre: str) -> bool:
+    """True si el objeto existe en el bucket. El listado se consulta una sola vez."""
+    global _REMOTOS
+    if _REMOTOS is None:
+        try:
+            import gcs
+            _REMOTOS = {Path(n).name for n, _ in gcs.listar(BUCKET, PREFIJO + "/", limite=20000)}
+        except Exception:
+            _REMOTOS = set()
+    return nombre in _REMOTOS
+
+
+def desde_bucket(nombre: str) -> Path | None:
+    """Trae una imagen del bucket a la caché local si existe allí; None si no."""
+    if not _en_bucket(nombre):
+        return None
+    try:
+        import gcs
+        ruta = Path(gcs.obtener(BUCKET, f"{PREFIJO}/{nombre}", verbose=False))
+        destino = CACHE / nombre
+        if ruta != destino:
+            destino.write_bytes(ruta.read_bytes())
+        return destino
+    except Exception:
+        return None
+
+
+#: Anchos de reserva. El servicio rechaza los tamaños grandes en recuadros pequeños, y
+#: un lote sin imagen es peor que un lote con imagen de menos resolución: se reintenta
+#: hacia abajo antes de darlo por perdido.
+RESERVA_PX = (700, 512)
+
+
 def bajar(cell_id: str, bbox, px: int = PX, forzar: bool = False) -> Path | None:
-    """Pide el recuadro al servicio y lo cachea. Devuelve la ruta local."""
+    """Recuadro cacheado; si falta, primero el bucket y después el servicio de Esri.
+
+    Si el servicio rechaza el ancho pedido, se reintenta con los de RESERVA_PX.
+    """
+    r = _bajar_a(cell_id, bbox, px, forzar)
+    if r is not None:
+        return r
+    for menor in RESERVA_PX:
+        if menor >= px:
+            continue
+        r = _bajar_a(cell_id, bbox, menor, forzar)
+        if r is not None:
+            print(f"     {cell_id}: servido a {menor} px, el servicio rechazó {px}")
+            return r
+    return None
+
+
+def _bajar_a(cell_id: str, bbox, px: int, forzar: bool) -> Path | None:
+    """Una sola tentativa, con un ancho concreto."""
     CACHE.mkdir(parents=True, exist_ok=True)
     destino = CACHE / f"sat_{cell_id}_{px}.jpg"
     if destino.exists() and not forzar and destino.stat().st_size > 2000:
+        return destino
+    if not forzar and desde_bucket(destino.name):
         return destino
 
     par = {"bbox": "%.6f,%.6f,%.6f,%.6f" % bbox, "bboxSR": 4326, "imageSR": 4326,
@@ -117,7 +174,29 @@ def bajar(cell_id: str, bbox, px: int = PX, forzar: bool = False) -> Path | None
         return None
 
     destino.write_bytes(r.content)
+    _al_bucket(destino)
     return destino
+
+
+def _al_bucket(ruta: Path) -> None:
+    """
+    Sube al bucket la imagen recién descargada, para que nadie más la vuelva a pedir.
+
+    El ciclo se cierra aquí: `bajar()` mira primero el bucket y solo acude al servicio
+    cuando falta; al volver, deja allí lo que trajo. Así la primera corrida paga la
+    descarga y las demás la reutilizan, corran en la máquina que corran.
+
+    No levanta nunca: que no se pueda publicar una imagen no puede detener el
+    procedimiento, porque en disco ya está y la corrida puede seguir. Se avisa y sigue.
+    """
+    if os.environ.get("PROSPECTOS_SIN_BUCKET"):
+        return
+    try:
+        import gcs
+        gcs.subir(BUCKET, f"{PREFIJO}/{ruta.name}", ruta, verbose=False)
+        _REMOTOS.add(ruta.name) if isinstance(_REMOTOS, set) else None
+    except Exception as exc:
+        print(f"     no se pudo publicar {ruta.name}: {type(exc).__name__}")
 
 
 def main(argv=None) -> int:

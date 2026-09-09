@@ -1,0 +1,278 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Prospectos Solares · el hilo conductor",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "de-la-grilla-al-lote",
+        "label": "De la grilla al lote",
+        "focus": [
+          "grillas_in",
+          "paso0",
+          "paso1",
+          "paso2",
+          "paso3"
+        ],
+        "note": "Un solo archivo de entrada se normaliza, baja el catastro del IGAC y se convierte en lotes medidos y caracterizados."
+      },
+      {
+        "id": "de-donde-salen-los-datos",
+        "label": "De dónde salen los datos",
+        "focus": [
+          "fuentes",
+          "paso2",
+          "paso3",
+          "paso4"
+        ],
+        "note": "Veintiséis fuentes oficiales alimentan la medición. El registro inmobiliario va aparte porque depende de un cupo diario."
+      },
+      {
+        "id": "que-se-entrega",
+        "label": "Qué se entrega",
+        "focus": [
+          "paso3",
+          "paso5",
+          "paso6",
+          "paso7"
+        ],
+        "note": "Visor navegable, Excel de la corrida y copia publicada en el bucket del proyecto."
+      }
+    ],
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "frontend": {
+          "label": "Entrada y visor"
+        },
+        "backend": {
+          "label": "Proceso en Python"
+        },
+        "database": {
+          "label": "Catastro descargado"
+        },
+        "security": {
+          "label": "Verificación previa"
+        },
+        "cloud": {
+          "label": "Bucket del proyecto"
+        },
+        "external": {
+          "label": "Fuente externa"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "insumo",
+      "label": "Insumos"
+    },
+    {
+      "id": "encadenado",
+      "label": "Encadenado de ejecutar.py"
+    },
+    {
+      "id": "externo",
+      "label": "Registro y publicación"
+    }
+  ],
+  "phases": [
+    {
+      "id": "preparar",
+      "label": "Preparar",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "caracterizar",
+      "label": "Caracterizar",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "entregar",
+      "label": "Entregar",
+      "fromCol": 4,
+      "toCol": 5
+    }
+  ],
+  "mainPath": [
+    "grillas_in",
+    "paso0",
+    "paso1",
+    "paso2",
+    "paso3",
+    "paso5",
+    "paso6",
+    "paso7"
+  ],
+  "nodes": [
+    {
+      "id": "grillas_in",
+      "lane": "insumo",
+      "col": 0,
+      "type": "frontend",
+      "label": "Grillas",
+      "sublabel": "GeoJSON con cell_id",
+      "width": 106
+    },
+    {
+      "id": "fuentes",
+      "lane": "insumo",
+      "col": 2,
+      "type": "external",
+      "label": "26 fuentes oficiales",
+      "sublabel": "IGAC, UPME, ESA, IDEAM, ANT, ANM",
+      "width": 150
+    },
+    {
+      "id": "paso0",
+      "lane": "encadenado",
+      "col": 0,
+      "type": "security",
+      "label": "0 · Verificar",
+      "sublabel": "insumos, .env y bucket",
+      "width": 106
+    },
+    {
+      "id": "paso1",
+      "lane": "encadenado",
+      "col": 1,
+      "type": "backend",
+      "label": "1 · Grillas",
+      "sublabel": "normaliza y hereda columnas",
+      "width": 118
+    },
+    {
+      "id": "paso2",
+      "lane": "encadenado",
+      "col": 2,
+      "type": "database",
+      "label": "2 · Catastro",
+      "sublabel": "terrenos del IGAC por celda",
+      "width": 118
+    },
+    {
+      "id": "paso3",
+      "lane": "encadenado",
+      "col": 3,
+      "type": "backend",
+      "label": "3 · Lotes",
+      "sublabel": "mide, entorno, POT, jurídico, valor",
+      "width": 146
+    },
+    {
+      "id": "paso5",
+      "lane": "encadenado",
+      "col": 4,
+      "type": "frontend",
+      "label": "5 · Visor",
+      "sublabel": "ficha navegable por lote",
+      "width": 106
+    },
+    {
+      "id": "paso6",
+      "lane": "encadenado",
+      "col": 5,
+      "type": "backend",
+      "label": "6 · Excel",
+      "sublabel": "hoja de grillas y hoja de lotes",
+      "width": 132
+    },
+    {
+      "id": "paso4",
+      "lane": "externo",
+      "col": 3,
+      "type": "external",
+      "label": "4 · Matrícula",
+      "sublabel": "predial municipal y SNR",
+      "width": 122
+    },
+    {
+      "id": "paso7",
+      "lane": "externo",
+      "col": 5,
+      "type": "cloud",
+      "label": "7 · Publicar",
+      "sublabel": "gs://prospectos-solares-salidas",
+      "width": 132
+    }
+  ],
+  "edges": [
+    {
+      "from": "grillas_in",
+      "to": "paso0"
+    },
+    {
+      "from": "paso0",
+      "to": "paso1"
+    },
+    {
+      "from": "paso1",
+      "to": "paso2",
+      "variant": "emphasis"
+    },
+    {
+      "from": "paso2",
+      "to": "paso3",
+      "variant": "emphasis"
+    },
+    {
+      "from": "paso3",
+      "to": "paso5"
+    },
+    {
+      "from": "paso5",
+      "to": "paso6"
+    },
+    {
+      "from": "paso6",
+      "to": "paso7"
+    },
+    {
+      "from": "fuentes",
+      "to": "paso2",
+      "label": "API y descarga",
+      "role": "branch"
+    },
+    {
+      "from": "fuentes",
+      "to": "paso3",
+      "label": "capas nacionales",
+      "role": "branch"
+    },
+    {
+      "from": "paso3",
+      "to": "paso4",
+      "role": "branch"
+    },
+    {
+      "from": "paso4",
+      "to": "paso5",
+      "label": "si alcanzó el cupo diario",
+      "variant": "dashed",
+      "role": "branch"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Un solo camino",
+      "items": [
+        "Un punto de entrada: ejecutar.py --corrida <nombre> --grillas <archivo>",
+        "El nombre de la corrida fija los tres destinos; --desde 5 rehace el visor sin repetir lo caro"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Nada inventado",
+      "items": [
+        "Lo que falta se dice por pantalla y queda en el manifiesto, no se rellena",
+        "El paso de matrícula no detiene la corrida si se agota el cupo gratuito"
+      ]
+    }
+  ]
+}

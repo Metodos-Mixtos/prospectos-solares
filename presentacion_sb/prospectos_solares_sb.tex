@@ -1,0 +1,803 @@
+% Prospectos Solares. Presentacion del procedimiento.
+%
+% Version SB. Rama propia del guion, independiente de presentacion/.
+%
+% Compilar desde presentacion_sb/:
+%   python figuras.py
+%   pdflatex -output-directory=../outputs/presentacion_sb/build prospectos_solares_sb.tex
+%   pdflatex -output-directory=../outputs/presentacion_sb/build prospectos_solares_sb.tex
+%   python verificar.py
+%   python powerpoint.py          (exporta entregables/...pptx)
+%   copy ../outputs/presentacion_sb/build/prospectos_solares_sb.pdf ^
+%        ../entregables/presentacion_prospectos_solares.pdf
+%
+% El PDF que se revisa es SIEMPRE el de entregables/. La carpeta build/ es el
+% taller de pdflatex y no se entrega: dejar dos mazos completos rodando fue lo
+% que hizo que se revisara una version que no era.
+%
+% El guion sigue el procedimiento tal como lo describe Samuel Blanco: donde se ha
+% construido, el mapa de grillas, el modelo de similitud, la caracterizacion y
+% seleccion por criterios del cliente, y la bajada al lote. Cada tramo entre dos
+% pasos tiene lamina propia y nombra el resultado concreto que viaja de uno al
+% otro, porque eso es lo que hace auditable la cadena.
+%
+% Regla de redaccion de esta presentacion: el lector no ve nunca un nombre de
+% fichero, ni de columna, ni de modulo. La trazabilidad se sostiene nombrando la
+% ETAPA que produce el dato y la ENTIDAD que lo publica, que es lo que un tercero
+% puede verificar. El fichero donde el proyecto lo guarda no le sirve a nadie.
+%
+% Segunda regla: una idea por lamina. Lo demas lo lleva la figura. Una figura
+% encogida no se lee proyectada, de modo que cuando una lamina no cabe se recorta
+% el texto antes que reducir la figura.
+%
+% Toda cifra de este fichero esta verificada contra la salida real.
+
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish, es-nodecimaldot]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, calc}
+\usepackage{xcolor}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\arraystretch}{1.25}
+
+\graphicspath{%
+  {../outputs/presentacion_sb/figuras/}%
+  {../outputs/presentacion_sb/capturas/}}
+\input{estilo.tex}
+
+% xcolor define \textcolor con un argumento corto, de modo que un salto de parrafo
+% dentro del texto coloreado aborta la compilacion. Aqui hay bloques de dos y tres
+% parrafos en gris, asi que se declara largo. Es la misma definicion de xcolor, solo
+% que \long.
+\makeatletter
+\long\def\@textcolor#1#2#3{\protect\leavevmode{\color#1{#2}#3}}
+\makeatother
+
+% --- Piezas propias de este guion -------------------------------------------
+% Tarjeta de resultado: lo que viaja de un paso al siguiente. Es un nodo de tikz,
+% de modo que la caja se dimensiona a partir del texto y no puede desbordarse.
+\tikzset{
+  artefacto/.style={
+    rectangle, rounded corners=3pt, draw=acento, line width=0.7pt,
+    fill=acentosuave, text width=#1, align=flush left, inner sep=8pt,
+    anchor=north west},
+  artefacto/.default=5.6cm,
+}
+
+% Lamina de transicion entre dos pasos. Siempre la misma composicion: a la
+% izquierda el resultado que sale, a la derecha el paso que lo recibe, y debajo el
+% parrafo que explica por que ese resultado basta.
+%   #1 rotulo del resultado   #2 contenido del resultado
+%   #3 rotulo del paso        #4 titulo del paso   #5 bajada del paso
+%   #6 parrafo
+% Sin [plain], por lo mismo que \parte: estas cuatro laminas salian sin numero.
+%
+% El text width del nodo de la derecha baja de 5,9 a 5,6 cm. Con 5,9 la caja se
+% pasaba 2,28 pt del ancho y el log daba Overfull hbox en las cuatro laminas de
+% transicion, siempre el mismo desbordamiento porque viene de este macro.
+\newcommand{\transicion}[6]{%
+  \begin{frame}
+    \vfill
+    \hspace{\margenlat}\begin{minipage}{0.88\paperwidth}
+      \raggedright
+      \begin{tikzpicture}
+        \node[artefacto=5.5cm] (a) at (0, 0)
+          {{\scriptsize\textcolor{acento2}{\textbf{\MakeUppercase{#1}}}}\\[0.35em]{\scriptsize\textcolor{tinta2}{#2}}};
+        \coordinate (p) at ($(a.east) + (1.5cm, 0)$);
+        \draw[-{Latex[length=2.2mm, width=1.8mm]}, acento, line width=0.9pt]
+          ($(a.east) + (0.35cm, 0)$) -- ($(p) - (0.25cm, 0)$);
+        \node[anchor=west, text width=5.6cm, align=flush left] at (p)
+          {{\scriptsize\textcolor{tinta3}{\MakeUppercase{#3}}}\\[0.3em]{\large\textcolor{tinta}{\textbf{#4}}}\\[0.3em]{\scriptsize\textcolor{tinta2}{#5}}};
+      \end{tikzpicture}
+
+      \vspace{1.4em}
+      {\small\textcolor{tinta2}{#6}}
+    \end{minipage}
+    \vfill
+  \end{frame}}
+
+\begin{document}
+
+% ============================================================ 1. PORTADA
+% El mapa es la red electrica del pais, lineas de transmision y subestaciones, y
+% va como imagen de portada: sin leyenda, sin rotulos y sin escala. Dice de que
+% trata el trabajo, que es buscar terreno donde esa red ya llega.
+%
+% Va en un overlay de tikz anclado al borde derecho de la pagina, no en una
+% columna del flujo: asi el mapa entra entero, sin recortar el oriente del pais,
+% y la columna de texto conserva su ancho. Metido en el flujo obligaba a
+% estrecharla y «Prospectos Solares» se partia en dos lineas.
+%
+% Sin la tira de tres cifras que iba bajo el filete (21.447, 100 y 647): son
+% resultados del procedimiento y no lo que la portada tiene que decir.
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=east, inner sep=0pt]
+      at ($(current page.east) - (0.55cm, 0)$)
+      {\includegraphics[height=0.94\paperheight]{fig_mapa_portada.pdf}};
+  \end{tikzpicture}%
+  \vspace{0.2em}
+  \begin{minipage}[c]{0.62\textwidth}
+    \raggedright
+    \isotipo{2.4em}\hspace{0.7em}%
+    \raisebox{0.80em}{\begin{minipage}{6cm}
+      \raggedright
+      {\large\textcolor{marca}{\textbf{MÉTODOS MIXTOS}}}\\[0.1em]{\scriptsize\textcolor{tinta3}{C\,O\,N\,S\,U\,L\,T\,O\,R\,E\,S}}
+    \end{minipage}}
+
+    \vspace{1.1em}
+    {\fontsize{26}{30}\selectfont\textcolor{tinta}{\textbf{Prospectos Solares}}}\\[0.45em]
+    {\normalsize\textcolor{tinta2}{Identificación y caracterización de terrenos aptos\\
+     para generación solar en Colombia}}
+
+    \vspace{1.1em}
+    \reglamarca
+
+    \vspace{1.6em}
+    {\small\textcolor{tinta}{Daniel Wiesner \quad$\cdot$\quad Susana Yepes\\[0.28em]
+     Samuel Blanco Castellanos}}\\[0.5em]{\scriptsize\textcolor{tinta3}{SEPTIEMBRE DE 2026}}
+  \end{minipage}
+\end{frame}
+
+% ============================================================ EL PROCEDIMIENTO
+\section{El procedimiento}
+
+% --- 2 ---
+\begin{frame}{Punto de partida}
+  \afirmacion{En Colombia el recurso solar no es el factor limitante.}
+  {Lo escaso es el lote donde coinciden las cuatro condiciones a la vez. Cada una vive
+  en una fuente distinta y ninguna se puede consultar a mano, uno a uno.}
+
+  \vspace{2.0em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright
+    \rotuloancla[0.22\linewidth]{Aptitud física del lote}\hfill
+    \rotuloancla[0.24\linewidth]{Capacidad libre en la red}\hfill
+    \rotuloancla[0.24\linewidth]{Régimen de suelo que permita el uso}\hfill
+    \rotuloancla[0.22\linewidth]{Propietario identificable}
+  \end{minipage}
+\end{frame}
+
+% --- 3 ---
+\begin{frame}{El procedimiento, en seis pasos}{Cada paso recibe un resultado, produce otro y se lo entrega al siguiente}
+  \vfill
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.66\paperheight, keepaspectratio]{fig_cadena.pdf}
+  \end{center}
+  \vfill
+\end{frame}
+
+% --- 4 ---
+% Columnas en \raggedright: justificadas en 3,3 cm y sin partir palabras, la tabla
+% abria rios de varios espacios («Las    grillas seleccionadas») y el log daba
+% cinco Underfull hbox, dos de ellos con badness 10000. El propio estilo.tex dice
+% que en columna estrecha no se justifica; esta tabla se habia quedado fuera.
+%
+% Sin shrink: las seis celdas de la tercera columna bajaron de dos lineas a una y
+% la nota al pie de cuatro lineas a una. La tabla cabe a su tamano.
+\begin{frame}{Lo que viaja entre un paso y el siguiente}{El procedimiento se puede auditar porque cada tramo deja un resultado propio}
+  {\footnotesize\renewcommand{\arraystretch}{0.95}\setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.35cm} >{\raggedright\arraybackslash}p{3.15cm} >{\raggedright\arraybackslash}p{6.85cm}@{}}
+    \toprule
+    \textcolor{tinta3}{\scriptsize PASO QUE LO PRODUCE} & \textcolor{tinta3}{\scriptsize RESULTADO QUE ENTREGA} & \textcolor{tinta3}{\scriptsize QUÉ CONTIENE}\\
+    \midrule
+    \textcolor{tinta2}{1.} El mapa de grillas & \textbf{El panel nacional} & 21.447 grillas de 5 por 5 km, con 43 columnas cada una.\\
+    \textcolor{tinta2}{2.} Dónde se ha construido & \textbf{El perfil de referencia} & Las grillas que ya tienen planta, con sus variables medidas.\\
+    \textcolor{tinta2}{3.} El modelo & \textbf{Las cien candidatas} & Las mismas 43 columnas del panel, más los tres puntajes del modelo.\\
+    \textcolor{tinta2}{4.} Selección de grillas & \textbf{Las grillas seleccionadas} & Las que el cliente marca en el reporte. En esta corrida fueron diez.\\
+    \textcolor{tinta2}{5.} De la grilla al lote & \textbf{La lista corta y su ficha} & Un lote por fila, con su medición y su calificación.\\
+    \textcolor{tinta2}{6.} La información para comprar & \textbf{El expediente de compra} & La petición de matrículas y el certificado de tradición leído.\\
+    \bottomrule
+  \end{tabular}}
+\end{frame}
+
+% --- 5 ---
+\begin{frame}{Reducción del universo de análisis}{Cada etapa deja fuera lo que no cumple su filtro; cuántas quedan depende de la corrida}
+  \vspace{0.3em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.615\paperheight, keepaspectratio]{fig_embudo.pdf}
+  \end{center}
+\end{frame}
+
+% ============================================================ PASO 2
+\section{Paso 1. El mapa de grillas}
+
+% --- 8. El paso 2 entero en una lamina --------------------------------------
+% Eran dos: la de transicion, que solo servia para decir que el perfil se guarda
+% hasta que haya algo con que compararlo, y la de la unidad de analisis. La
+% segunda se sostiene sola y la primera se va.
+%
+% Se van tambien las dos que seguian, la de las familias de variables y la del
+% suelo urbano: son detalle del reporte de caracterizacion, no del guion. Con
+% ellas quedan sin uso fig_variables.pdf y fig_urbano.pdf.
+\begin{frame}{El mapa de grillas}{Una grilla equivale a 25 km\textsuperscript{2} de territorio}
+  \begin{minipage}[t]{0.60\textwidth}
+    \vspace{0pt}
+    \includegraphics[width=\linewidth, height=0.585\paperheight, keepaspectratio]{fig_grilla_contexto.pdf}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.365\textwidth}
+    \vspace{0.6em}
+    \bandera\small\textcolor{tinta2}{El panel cubre \textbf{21.447 cuadrículas} de 5 por
+    5 kilómetros, algo menos de la mitad del país. Grilla y celda nombran lo mismo.
+
+    \vspace{0.9em}
+    La grilla no es el proyecto. Es la unidad que hace comparable con un mismo dato todo
+    lo que el panel cubre, medido a distancia, sin pedir información a nadie y sin salir a
+    campo.}
+  \end{minipage}
+  \fuente{Celda 0008656, Montería, sobre imagen de Esri World Imagery. El panel cubre
+  536.175 de los 1.168.350 km\textsuperscript{2} del país.}
+\end{frame}
+
+% ============================================================ PASO 1
+\section{Paso 2. Dónde se ha construido}
+
+% --- 8 ---
+% La figura sube de 0,40 a 0,46 de la altura y el texto baja a tres lineas: las
+% etiquetas del grafico estaban a 7,0 pt de interlineado, por debajo del pie de la
+% propia presentacion.
+\begin{frame}{Qué distingue a una grilla que ya tiene planta}{Diferencia medida frente al resto del panel, ordenada de mayor a menor}
+  \vspace{-0.2em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.495\paperheight, keepaspectratio]{fig_contraste.pdf}
+  \end{center}
+  \vspace{-0.4em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{El recurso solar aparece en séptimo
+    lugar: en Colombia es abundante casi en todas partes y por eso separa poco. Lo
+    escaso es el acceso a la red.}
+  \end{minipage}
+  \fuente{A la izquierda, las grillas con al menos una planta de 10 MW o más registrada en
+  el operador del mercado; a la derecha, el resto del panel. El corte es por tamaño, no por
+  si ya arrancó. Cada panel lleva su escala; la privación va de 0 a 100 y más alto es peor.}
+\end{frame}
+
+% ============================================================ PASO 3
+\section{Paso 3. El modelo}
+
+% --- 8. El paso 3 en una sola lamina ----------------------------------------
+% Eran cuatro: la transicion que anunciaba el paso, esta, la de los limites del
+% modelo y la del radio de la subestacion. Quedan fundidas en la que explica como
+% se mide el parecido, que es la unica que ensena el mecanismo.
+\begin{frame}{El modelo: cómo se mide el parecido}{Dos preguntas distintas, combinadas en un solo puntaje}
+  \vspace{0.2em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.54\paperheight, keepaspectratio]{fig_similitud.pdf}
+  \end{center}
+  \fuente{Cada componente se lleva a una escala de 0 a 1 antes de mezclarlo, porque uno es
+  una distancia de Mahalanobis y el otro una euclidiana: el puntaje ordena dentro de la
+  corrida y no es una nota absoluta. Usa 33 de las 43 columnas del panel.}
+\end{frame}
+
+
+% --- 18 ---
+\transicion{Cien candidatas}
+  {Identificador de celda $\cdot$ polígono $\cdot$ covariables.}
+  {Paso 4}{Selección de grillas}{Por los criterios y los umbrales del cliente.}
+  {El paso siguiente no necesita saber cómo se calculó el puntaje ni vuelve a abrir el
+  modelo. Por eso el procedimiento es reemplazable por tramos: si mañana el modelo
+  devuelve otras cien, el paso 4 corre igual.}
+
+% ============================================================ PASO 4
+\section{Paso 4. Selección de grillas}
+
+% --- 19 ---
+% Aqui habia una captura del panel de exclusiones del reporte. Es un panel de puro
+% texto: puesta a 0,62 del ancho de lamina, su cuerpo quedaba por debajo de 3 pt y
+% no se leia proyectada. Ademas decia «las diez plantas de 50 MW o mas» y la nota
+% de esta misma lamina decia once, que es una contradiccion a la vista. Los cinco
+% criterios van ahora compuestos en la lamina, legibles, y el conteo de plantas se
+% enuncia de la unica forma que es cierta con los dos cortes de lectura.
+\begin{frame}{Lo que impide el desarrollo}{Cuatro condiciones que se aplican antes de calificar nada}
+  \vspace{0.2em}
+  {\footnotesize
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.5cm} >{\raggedright\arraybackslash}p{10.0cm}@{}}
+    \toprule
+    \textbf{Figura jurídica} & Parque nacional, resguardo indígena, consejo comunitario o área protegida del RUNAP.\\
+    \textbf{Altitud sobre 3.000 m} & Páramo. La Ley 1930 de 2018 prohíbe allí las actividades de alto impacto.\\
+    \textbf{Cultivos de coca} & Riesgo operativo. Ninguna planta de escala utility del país está en una grilla con coca.\\
+    \textbf{Conflicto armado} & Tres o más acciones bélicas desde 2022 y una densidad de tres o más por mil km\textsuperscript{2}. Ninguna planta de 50 MW o más está en un municipio así. Al corte de 10 MW, que es el que calibra los umbrales, hay cinco excepciones, tres de ellas ya en operación.\\
+    \bottomrule
+  \end{tabular}}
+
+\end{frame}
+
+% --- 20 ---
+\begin{frame}{Cómo se pondera cada criterio}{La metodología es fija; los criterios y su número, no}
+  \vspace{-0.3em}
+  \begin{center}
+    \includegraphics[width=0.94\textwidth, height=0.42\paperheight, keepaspectratio]{fig_pesos.pdf}
+  \end{center}
+  \vspace{0.3em}
+  \hspace{0.02\textwidth}\begin{minipage}{0.94\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{El peso de cada criterio sale de una sola
+    medida: cuánto separa ese criterio las grillas que ya tienen planta de las demás
+    grillas al alcance de la red. Esa regla no cambia. Los siete de abajo son los que hoy
+    se usan, pero el catálogo puede crecer o cambiar: al añadir un criterio, su peso se
+    calcula igual y los demás se reajustan solos.}
+  \end{minipage}
+  \fuente{Aquí la comparación es contra las grillas al alcance de la red, no contra el panel entero.}
+\end{frame}
+
+% --- 21 ---
+% Aqui habia una captura de la matriz de criterios del reporte: una tabla de siete
+% filas por seis columnas capturada a 2.388 px de ancho. Colocada en la lamina, su
+% cuerpo aterrizaba en unos 2 pt y no se leia ni una cifra, con lo que la unica
+% lamina que ensena como se puntua un criterio no ensenaba nada. La escala se
+% dibuja, con el ejemplo medido de un criterio real.
+\begin{frame}{Los umbrales los pone el cliente}{Tres puntos por criterio, editables: al mover uno, las cien grillas se reclasifican a la vista}
+  \vspace{0.6em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.505\paperheight, keepaspectratio]{fig_escala.pdf}
+  \end{center}
+  \vspace{0.6em}
+  \hspace{0.02\textwidth}\begin{minipage}{0.94\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{Los tres puntos son percentiles de las 53
+    celdas del país que ya tienen planta de 10 MW o más, y el cliente los reescribe. El decil
+    mejor es el percentil 90 aquí, donde más es mejor.}
+  \end{minipage}
+\end{frame}
+
+% --- 22 ---
+% La captura del reparto tenia tres cuartas partes de blanco al pie: con
+% keepaspectratio la altura mandaba y la barra salia a 3,5 cm de ancho, ilegible.
+% La figura dice lo mismo, ensena ademas donde cae cada grilla en el indice y se
+% lee proyectada.
+\begin{frame}{Cómo se clasifica cada grilla}{El índice ordena, pero un solo criterio fuera de su límite cambia la clase}
+  \vspace{0.4em}
+  \begin{center}
+    \includegraphics[width=0.94\textwidth, height=0.33\paperheight, keepaspectratio]{fig_distribucion.pdf}
+  \end{center}
+
+  \vspace{0.4em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{La clasificación no es el índice. Una
+    grilla con índice alto queda \textbf{Condicionada} si un solo criterio cae por debajo
+    de su límite, y las \textbf{Excluidas} no reciben calificación porque una figura
+    jurídica o de riesgo las retira antes de puntuar.}
+  \end{minipage}
+  \fuente{Condicionada no es un rechazo: son 78 de las 100 candidatas y ocho de las diez
+  grillas que pasan al paso 5. Aquí el rojo es el último escalón de la escala de la
+  grilla; lo que se descarta va en gris. Cada grilla lleva escrito su motivo concreto, en
+  su ficha y en la tabla del reporte.}
+\end{frame}
+
+% --- 17 ---
+% El mapa era una captura de pantalla que llegaba a 3,19 cm de ancho, sin leyenda y
+% con el contorno del pais casi invisible: la lamina que ensena el resultado del
+% modelo y no se podia leer que significaba el color. Ahora es vectorial, con
+% leyenda del indice, y la tabla de departamentos baja al pie en fila horizontal
+% para dejarle el alto entero.
+\begin{frame}{Dónde caen las cien candidatas ya calificadas}{Cien puntos, uno por grilla, con el color de su índice}
+  \begin{minipage}[t]{0.62\textwidth}
+    \vspace{0pt}
+    \centering
+    \includegraphics[width=\linewidth, height=0.585\paperheight, keepaspectratio]{fig_mapa.pdf}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.345\textwidth}
+    \vspace{0.6em}
+    \bandera\footnotesize\textcolor{tinta2}{El color es el índice de la grilla, que se
+    calcula en este paso y no en el anterior.
+
+    \vspace{0.8em}
+    Las cien no salen sueltas: caen en unas pocas zonas. Ahí coinciden la red cerca, el
+    relieve plano y el suelo agrícola, que es lo que más pesa en el índice.}
+  \end{minipage}
+  \fuente{Las doce Excluidas no llevan color: una figura de riesgo las retira antes de puntuar.}
+\end{frame}
+
+% --- 15 y 16. La ficha de la grilla, en dos laminas -------------------------
+% Una sola lamina no daba. El cuerpo de la ficha son 11 px sobre una pagina de
+% 900: para que ese texto pase de los 7 pt del sistema hay que ensenar una
+% columna de 410 px a nueve centimetros o mas, y eso no cabe junto a nada. Se
+% parte en dos: aqui las dos piezas graficas, que escalan bien, y en la siguiente
+% la tabla de criterios ampliada hasta que se lee.
+\begin{frame}{La ficha de cada grilla}{Una página por celda, lista para imprimir o adjuntar}
+  \vspace{0.1em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.60\paperheight, keepaspectratio]{fig_ficha_celda_comercial.pdf}
+  \end{center}
+  \fuente{Ficha de la grilla 0008656, Montería, tomada del reporte que se entrega.}
+\end{frame}
+
+% --- 16 ---
+\begin{frame}{Lo que la ficha califica}{Cada criterio, con su umbral, su nota y su veredicto}
+  \vspace{0.1em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.605\paperheight, keepaspectratio]{fig_ficha_criterios_grilla.pdf}
+  \end{center}
+  \fuente{Tres de los siete. La nota interpola entre tres anclas: límite 0, objetivo 70 y tope 100.}
+\end{frame}
+
+% --- 24 ---
+\transicion{Grillas seleccionadas}
+  {Identificador $\cdot$ polígono $\cdot$ datos de conexión.}
+  {Paso 5}{De la grilla al lote}{Catastro, medición, criba y ficha.}
+  {Aquí cambia la unidad de análisis. Hasta este punto el objeto es la celda de 25
+  kilómetros cuadrados; a partir de aquí es el lote del catastro, con sus linderos, su
+  código y su propietario. El número de grillas seleccionadas no altera el
+  procedimiento, solo el volumen de consultas.}
+
+% ============================================================ PASO 5
+\section{Paso 5. De la grilla al lote}
+
+% --- 25 ---
+\begin{frame}{El catastro dentro de la grilla}{Se bajan todos los lotes y cada uno recibe sus propios valores}
+  \begin{minipage}[t]{0.492\textwidth}
+    \vspace{0pt}\centering
+    \includegraphics[width=\linewidth, height=0.425\paperheight, keepaspectratio]{fig_catastro_celda.pdf}\\[0.4em]
+    {\scriptsize\textcolor{tinta3}{Lo que baja del catastro}}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.492\textwidth}
+    \vspace{0pt}\centering
+    \includegraphics[width=\linewidth, height=0.425\paperheight, keepaspectratio]{fig_catastro_clasificado.pdf}\\[0.4em]
+    {\scriptsize\textcolor{tinta3}{Los mismos lotes, ya clasificados}}
+  \end{minipage}
+
+  \vspace{0.1em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{Se descarga el catastro completo del
+    Instituto Geográfico Agustín Codazzi, sin filtrar, y cada lote se mide sobre su
+    polígono.}
+  \end{minipage}
+  \fuente{Celda 0010961, La Unión, Sucre. Otra escala: azul idóneo, ámbar con gestión, rojo no viable.}
+\end{frame}
+
+% --- 17. De donde sale cada dato -------------------------------------------
+% Faltaba. El guion contaba que el lote se mide y se clasifica, pero no de donde
+% sale la informacion. Cada familia se nombra por la ENTIDAD que la publica, que
+% es lo que un tercero puede verificar.
+\begin{frame}{De dónde sale la información de cada lote}{Cinco familias de fuente, cada dato con la entidad que lo publica}
+  \vspace{0.2em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.505\paperheight, keepaspectratio]{fig_fuentes_lote.pdf}
+  \end{center}
+  \fuente{Nueve entidades: Instituto de Hidrología, Meteorología y Estudios Ambientales,
+  que aporta trece de las veinticinco capas, Agencia Nacional de Minería, Agencia Nacional
+  de Hidrocarburos, Agencia Nacional de Tierras, Servicio Geológico Colombiano, Parques
+  Nacionales Naturales, Ministerio de Ambiente, Instituto Geográfico Agustín Codazzi y
+  Unidad de Planificación Rural Agropecuaria. El anexo trae qué aporta cada una.}
+\end{frame}
+
+% --- 18. Las tres clases ---------------------------------------------------
+% La clase no sale de un umbral sobre el indice: sale de un catalogo de doce
+% condiciones comprobadas una a una contra la fuente oficial de cada figura.
+\begin{frame}{Cómo queda clasificado cada lote}{La clase no sale de un puntaje: sale de las condiciones que se comprueban}
+  \vspace{0.3em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.575\paperheight, keepaspectratio]{fig_clases_lote.pdf}
+  \end{center}
+  \vspace{0.1em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{Quien lee la ficha no recibe un veredicto:
+    recibe la siguiente gestión, con nombre de entidad.}
+  \end{minipage}
+\end{frame}
+
+% --- 18. El filtro lo pone el cliente --------------------------------------
+% Aqui iban dos laminas: la criba de 2.745 lotes a los caracterizados y la de los
+% preajustes de tamano. La primera se retira; la segunda se rehace sin cifras.
+%
+% El cliente no necesita saber cuantos lotes cayo cada filtro, sino que los
+% umbrales son suyos. La figura distingue las dos naturalezas de decision, la que
+% admite grados y la que solo se cumple o no, que es lo que de verdad hay que
+% entender antes de sentarse a mover controles.
+\begin{frame}{El filtro lo pone el cliente}{Dos tipos de decisión: la que admite grados y la que no los admite}
+  \vspace{0.3em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.52\paperheight, keepaspectratio]{fig_filtro_cliente.pdf}
+  \end{center}
+  \vspace{0.2em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{Setenta y cinco criterios en ocho grupos,
+    de los que aquí van diez. Ninguno viene impuesto: el cliente fija lo que su proyecto
+    necesita y la lista se rehace a la vista. Un lote sin dato no se retira: la ausencia de
+    dato no es un incumplimiento.}
+  \end{minipage}
+\end{frame}
+
+% --- 28 ---
+% Dos laminas en lugar de una. La tabla de siete criterios por seis columnas
+% numericas iba a 4,35 cm de ancho y 4,9 pt de interlineado: es el tipo de figura
+% que no admite reduccion. Ahora ocupa una lamina entera.
+%
+% Y la tabla ya no es una captura. La que habia se tomo antes de que los umbrales
+% se recalibraran a escala de lote: mostraba un indice de 77 donde el reporte que
+% se entrega hoy dice 65. Se dibuja desde la salida vigente, de modo que no puede
+% volver a desfasarse.
+\begin{frame}{La ficha del lote}{Cada calificación queda justificada, criterio por criterio}
+  \vfill
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.56\paperheight, keepaspectratio]{fig_ficha_criterios.pdf}
+  \end{center}
+  \vfill
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{El índice se reconstruye a la vista: es el
+    promedio de las notas ponderado por el peso.}
+  \end{minipage}
+  \fuente{Vía y producción se detienen en 70: su objetivo está pegado al tope, sin recalibrar.}
+\end{frame}
+
+% --- 29 ---
+% La captura de cabecera que iba aqui era anterior a la recalibracion de umbrales:
+% su rotulo decia INDICE DEL LOTE 77 junto a una lamina que afirma 65. La identidad
+% del lote se compone ahora con las piezas del sistema y no puede desfasarse.
+\begin{frame}{Lo que la ficha dice de ese lote}{El índice califica el terreno; la clase dice qué hay que gestionar}
+  \begin{minipage}[t]{0.42\textwidth}
+    \vspace{0pt}
+    \centering
+    \includegraphics[width=\linewidth, height=0.50\paperheight, keepaspectratio]{fig_lote_ejemplo.pdf}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.54\textwidth}
+    \vspace{0.2em}
+    \raggedright
+    \rotulo{Lote del catastro}\\[0.5em]
+    {\large\textcolor{tinta}{\textbf{Sabana de Torres}}}\\[0.25em]
+    {\small\textcolor{tinta2}{Santander $\cdot$ 222 hectáreas}}\\[0.9em]
+    \chip{aviso}{Viable con gestión}
+
+    \vspace{0.9em}
+    \cifraancla[0.42\linewidth]{65}{índice del lote sobre 100}\hfill
+    \cifraancla[0.52\linewidth]{3}{condiciones que exigen trámite}
+  \end{minipage}
+  \fuente{Las tres: Unidad Agrícola Familiar, restitución de tierras y un humedal dentro
+  del lote. La ficha nombra la entidad ante la que se adelanta cada trámite.}
+\end{frame}
+
+% ============================================================ DEL LOTE AL FOLIO
+% Dos laminas antes del piloto. La cadena registral es lo que convierte un lote
+% medido en un lote comprable, y hasta ahora el guion la despachaba en tres
+% tarjetas al final. Va en grafico y casi sin texto: son cinco pasos y lo que hay
+% que retener es el orden y quien produce cada pieza.
+\section{Del lote al folio}
+
+% --- 21 ---
+\begin{frame}{Del código catastral al diagnóstico jurídico}{Cinco pasos entre el lote medido y el lote que se puede comprar}
+  \vfill
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.515\paperheight, keepaspectratio]{fig_cadena_registro.pdf}
+  \end{center}
+  \vfill
+  \fuente{Matrículas: Ley 1755 de 2015, sin costo, diez días hábiles. Certificado electrónico:
+  23.000 pesos hasta 150 anotaciones, Resolución 2026-001726. Semáforo: Resolución 7448 de 2021.}
+\end{frame}
+
+
+% --- 22 ---
+% El modelo NO sustituye la lectura determinista: la audita. Esa jerarquia es lo
+% que hace defendible el paso, y por eso la lamina la enuncia antes que nada.
+\begin{frame}{Qué añade el modelo sobre la lectura automática}{La lectura por regla es la verdad de base; el modelo la audita y amplía}
+  \vspace{0.2em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.545\paperheight, keepaspectratio]{fig_diagnostico.pdf}
+  \end{center}
+  \vspace{0.1em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{Leer un folio exige seguir la cadena de
+    tradición, y eso una expresión regular no lo hace. El diagnóstico se anexa a la
+    ficha del lote, con la lectura por regla al lado.}
+  \end{minipage}
+\end{frame}
+
+% --- Como se usa el modelo de lenguaje -------------------------------------
+% La pregunta que un jefe hace primero es si se esta confiando en una IA. La
+% lamina la responde con el mecanismo: no sustituye a nada, audita una lectura
+% determinista que sigue siendo la verdad de base, y contesta sobre un catalogo
+% cerrado de claves, de modo que no puede inventar categorias de riesgo.
+\begin{frame}{Cómo se usa el modelo de lenguaje}{Cuatro tramos, y una garantía en cada uno}
+  \vspace{0.2em}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.585\paperheight, keepaspectratio]{fig_flujo_ia.pdf}
+  \end{center}
+  \fuente{El prompt y el esquema están corridos sobre el folio del piloto; falta
+  publicarlos en el repositorio.}
+\end{frame}
+
+% ============================================================ EL PILOTO
+% Dos laminas. La anterior termina diciendo que el terreno no es el problema y la
+% red si; el piloto es la prueba de esa frase sobre un caso concreto, y la
+% siguiente recoge el veredicto lote a lote.
+%
+% El veredicto es desfavorable y se presenta sin maquillar: un piloto que solo
+% confirmara lo que se desea no probaria nada.
+\section{El piloto}
+
+% --- 31 ---
+\begin{frame}{El piloto, de la grilla al lote}{Una grilla, 57 lotes medidos, un veredicto por cada uno}
+  \begin{minipage}[t]{0.42\textwidth}
+    \vspace{0pt}
+    \centering
+    \includegraphics[width=\linewidth, height=0.44\paperheight, keepaspectratio]{v5_piloto_grilla.png}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.54\textwidth}
+    \vspace{0.2em}
+    \raggedright\footnotesize\textcolor{tinta2}{La celda \textbf{0014590}, en Melgar,
+    Tolima, \textbf{no estaba entre las cien candidatas}. Se tomó del panel nacional y se
+    inyectó como si hubiera pasado el filtro, para correr la cadena entera sobre un
+    terreno que nadie eligió por conveniente.
+
+    \vspace{0.9em}
+    Salió \textbf{Condicionada}, con índice \textbf{39,4}. Conecta en Lanceros 115 kV a
+    13,4 km, con \textbf{190,6 MW} libres en barra en 2026: la octava cifra más alta del
+    país. La misma barra cae a 137,1 MW en 2027 y a 29,9 en 2028. El
+    catastro cubre el \textbf{34 \%} de la grilla, y de sus 205 lotes 57 quedan
+    caracterizados y 148 se apartan.}
+  \end{minipage}
+  \fuente{El resultado se declara sobre lo que devuelve el servicio de catastro, no sobre
+  la grilla entera.}
+\end{frame}
+
+% --- 32 ---
+\begin{frame}{El Poblado: el procedimiento dice que no}{Fila 21 de 57 por área catastral, índice 30 sobre 100, un criterio cumplido de siete}
+  \begin{center}
+    \includegraphics[width=\textwidth, height=0.44\paperheight, keepaspectratio]{fig_piloto_criterios.pdf}
+  \end{center}
+  \vspace{0.4em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{\textbf{68 \% de bosque} y 4,5 hectáreas
+    aptas de 14,0, con \textbf{99,7 \% de suelo de protección} en el POT. La salida lo
+    clasifica \textbf{No viable}: ninguna gestión del proyecto levanta esa condición.}
+  \end{minipage}
+  \fuente{\textbf{El procedimiento sirve sobre todo cuando dice que no, y dice por qué.}
+  El veredicto se contrastó contra la realidad del terreno en la revisión del 27 de agosto
+  y coincidió. Melgar no tiene resolución de Unidad Agrícola Familiar cargada: la ficha no
+  marca exceso, pero tampoco afirma que el lote quepa.}
+\end{frame}
+
+% ============================================================ PASO 6
+\section{Paso 6. La información para comprar}
+
+% El canal entre la caja del resultado y el parrafo quedaba en menos de 2 mm y se
+% leia como una colision: las tres tarjetas se reparten en 13,4 cm en lugar de
+% 10,3, que dejaban un tercio de la lamina vacio a la derecha.
+% El bloque de arriba era un nodo como el de las laminas de transicion, y repetia
+% una composicion que el guion ya ha usado cuatro veces ademas de costar 1,7 cm de
+% alto en la lamina mas cargada. Con una sola linea de texto y las descripciones
+% recortadas, las tres tarjetas caben sin encoger.
+\begin{frame}{Del paso 5 al paso 6, y lo que el catastro no dice}{Lo que viaja: la lista corta de lotes con su ficha}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \raggedright\footnotesize\textcolor{tinta2}{Con la lista corta se sale a campo, pero
+    no se firma: el propietario y la matrícula los publica la Superintendencia de
+    Notariado y Registro, no el catastro.}
+  \end{minipage}
+
+  \vspace{0.1em}
+  \begin{tikzpicture}[x=1cm, y=1cm]
+    \node[cajarot=3.85cm, minimum height=2.45cm] (m) at (0, 0)
+      {\cajatexto{Matrícula}{Automático}{El sistema arma el derecho de petición, listo
+       para radicar. Diez días hábiles y silencio positivo. Gratis.}};
+    \node[cajarot=3.85cm, minimum height=2.45cm] (c) at (4.72, 0)
+      {\cajatexto{Certificado}{23.000 por lote}{La compra es manual, folio a folio; el
+       semáforo clasifica once riesgos: falsa tradición, baldío adjudicado, restitución.}};
+    \node[cajarot=3.85cm, minimum height=2.45cm] (u) at (9.44, 0)
+      {\cajatexto{Unidad Agrícola Familiar}{La que decide}{Tope legal de acumulación
+       sobre lo que fue baldío adjudicado. La compra que lo viola es nula: la vía es
+       arriendo largo o usufructo.}};
+  \end{tikzpicture}
+  \fuente{Petición de matrículas: Ley 1755 de 2015. Semáforo del certificado: Resolución 7448 de 2021.}
+\end{frame}
+
+% ============================================================ CIERRE
+\section{Estado}
+
+% --- 34 ---
+% «Prueba piloto sobre un lote conocido» estaba en la columna de lo pendiente el
+% mismo dia en que se entrega el piloto de Melgar con sus 46 lotes: pasa a lo
+% operativo. En lo pendiente queda lo que de verdad falta, que es el contraste
+% contra el desempeno real de las plantas en operacion.
+%
+% Sin shrink: «lo que se entrega» eran tres nombres de fichero html y ahora son
+% tres lineas de lenguaje corriente, que ocupan lo mismo, y las dos columnas de
+% arriba perdieron una linea cada una.
+\begin{frame}{Estado y siguiente paso}
+  \vspace{0.1em}
+  \begin{minipage}[t]{0.47\textwidth}
+    \raggedright
+    \rotulo[acento]{Operativo hoy}\\[0.5em]{\footnotesize\textcolor{tinta2}{Caracterización de grillas con umbrales editables.\\[0.10em]
+    Descarga del catastro y medición del lote.\\[0.10em]
+    Cruce con POT, valor, entorno y criba jurídica.\\[0.10em]
+    Derecho de petición de matrículas y su anexo.\\[0.10em]
+    Lectura automática del certificado de tradición.\\[0.10em]
+    Diagnóstico jurídico del folio con modelo de lenguaje.\\[0.10em]
+    Piloto completo de una grilla.}}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.47\textwidth}
+    \raggedright
+    \rotulo[aviso]{En desarrollo}\\[0.5em]{\footnotesize\textcolor{tinta2}{Valoración por comparables de mercado.\\[0.10em]
+    Automatización de la compra del certificado.\\[0.10em]
+    Identificación y contacto del propietario.\\[0.10em]
+    Contraste del índice contra el desempeño real de las plantas.}}
+  \end{minipage}
+
+  \vspace{-0.35em}
+  \hspace{0.01\textwidth}\begin{minipage}{0.96\textwidth}
+    \filete\\[0.25em]
+    \begin{minipage}[t]{0.47\linewidth}
+      \raggedright
+      \rotulo[acento2]{Lo que se entrega}\\[0.5em]{\footnotesize\textcolor{tinta2}{Reporte de las cien candidatas.\\[0.15em]
+      Visor de los 839 lotes.\\[0.15em]
+      Visor del piloto, 57 lotes.}}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.47\linewidth}
+      \raggedright
+      \rotulo[acento2]{La decisión que sigue}\\[0.5em]{\footnotesize\textcolor{tinta2}{A escala utility la barra no da: falla en 66
+      de las cien. A escala distribuida sí; fijar el perfil define la lista y el costo.}}
+    \end{minipage}
+  \end{minipage}
+\end{frame}
+
+% ============================================================ ANEXO
+\section{Anexo}
+
+% arraystretch local: con el 1,25 del resto del documento, once filas de tabla no
+% caben en la lamina y beamer la encogia un 32 %.
+\begin{frame}{Fuentes y cortes}{El panel nacional y el modelo}
+  {\scriptsize\renewcommand{\arraystretch}{1.14}\setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.55cm} >{\raggedright\arraybackslash}p{4.95cm} >{\raggedright\arraybackslash}p{3.90cm}@{}}
+    \toprule
+    \textcolor{tinta3}{FUENTE} & \textcolor{tinta3}{QUÉ APORTA} & \textcolor{tinta3}{VERSIÓN O CORTE}\\
+    \midrule
+    Copernicus DEM GLO-30 & Pendiente, rugosidad y elevación & Release 2021, 30 m\\
+    Agencia Espacial Europea & Cobertura del suelo, WorldCover & 2021 v200, 10 m\\
+    Global Solar Atlas, Banco Mundial & Recurso solar en el punto & Datos 1.7, abril de 2026\\
+    Unidad de Planeación Minero Energética & Capacidad libre por barra, Circular Externa 054 & 2026, preliminar, corte 5-may-2026\\
+    XM, operador del mercado eléctrico & Plantas solares registradas & 253 plantas, 148 en operación\\
+    Centro Nacional de Memoria Histórica & Acciones bélicas por municipio & Desde 2022\\
+    OpenStreetMap & Líneas de transmisión, subestaciones y vías & Descarga 10-ago-2026, ODbL\\
+    Esri World Imagery & Imagen satelital de referencia & Mosaico vivo, fecha por vista\\
+    \bottomrule
+  \end{tabular}}
+\end{frame}
+
+% --- Segunda y tercera lamina de fuentes. Sin siglas: los nombres de
+% institucion van completos, que es como un tercero las localiza.
+%
+% Van en dos laminas porque en una sola no caben. El anexo nombraba cinco
+% entidades y el lote se cruza contra nueve: faltaban el Instituto de
+% Hidrologia, que aporta trece de las veinticinco capas, las dos agencias de
+% minas e hidrocarburos y el Servicio Geologico, y esas dos primeras sostienen
+% dos de las condiciones de la lamina de clases. -------------------------
+\begin{frame}{Fuentes y cortes}{El lote: catastro, ordenamiento y tenencia}
+  {\scriptsize\renewcommand{\arraystretch}{1.14}\setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.55cm} >{\raggedright\arraybackslash}p{4.95cm} >{\raggedright\arraybackslash}p{3.90cm}@{}}
+    \toprule
+    \textcolor{tinta3}{FUENTE} & \textcolor{tinta3}{QUÉ APORTA} & \textcolor{tinta3}{VERSIÓN O CORTE}\\
+    \midrule
+    Instituto Geográfico Agustín Codazzi & Polígono del lote, código, destino y valor catastral de referencia & Corte 30-jun-2026\\
+    Instituto Geográfico Agustín Codazzi & Ordenamiento territorial y capacidad de uso de las tierras & Servicio vivo; multiescalar 2024\\
+    Unidad de Planificación Rural Agropecuaria & Frontera agrícola nacional & Actualización 2024\\
+    Agencia Nacional de Tierras & Unidad Agrícola Familiar, resguardos y consejos comunitarios & 25-jun-2026\\
+    Unidad de Restitución de Tierras & Microzonas focalizadas para restitución & 31-jul-2026\\
+    Superintendencia de Notariado y Registro & Matrícula y certificado de tradición & Consulta por lote\\
+    \bottomrule
+  \end{tabular}}
+\end{frame}
+
+\begin{frame}{Fuentes y cortes}{El lote: el entorno}
+  {\scriptsize\renewcommand{\arraystretch}{1.14}\setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.55cm} >{\raggedright\arraybackslash}p{4.95cm} >{\raggedright\arraybackslash}p{3.90cm}@{}}
+    \toprule
+    \textcolor{tinta3}{FUENTE} & \textcolor{tinta3}{QUÉ APORTA} & \textcolor{tinta3}{VERSIÓN O CORTE}\\
+    \midrule
+    Instituto de Hidrología, Meteorología y Estudios Ambientales & Drenajes, antecedentes de inundación, sequía, incendios y régimen de lluvia & Trece de las veinticinco capas; servicio en vivo\\
+    Ministerio de Ambiente y Desarrollo Sostenible & Páramos, humedales y cuencas ordenadas & Sistema de Información Ambiental\\
+    Parques Nacionales Naturales de Colombia & Áreas protegidas del Registro Único Nacional & Servicio en vivo\\
+    Agencia Nacional de Minería & Títulos y solicitudes mineras vigentes & Servicio en vivo\\
+    Agencia Nacional de Hidrocarburos & Tierras en contrato o evaluación & Servicio en vivo\\
+    Servicio Geológico Colombiano & Amenaza por movimientos en masa y amenaza sísmica & Escala 1:100.000\\
+    \bottomrule
+  \end{tabular}}
+  \fuente{Cuatro capas de clima y suelo se consultan en el centroide del lote; el resto,
+  contra su polígono. Cuando un servicio no responde, la ficha lo dice en vez de dar el
+  criterio por cumplido.}
+\end{frame}
+
+
+\end{document}

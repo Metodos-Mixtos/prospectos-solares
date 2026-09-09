@@ -304,6 +304,141 @@ TOP_CANDIDATOS_PATH = SALIDAS / "top_candidates.gpkg"
 
 
 # --------------------------------------------------------------------------
+# Salidas: dónde escribe cada corrida y dónde se publica lo que produce
+# --------------------------------------------------------------------------
+#
+# Hasta aquí este módulo solo declaraba de dónde se LEE. Los 17 conjuntos de
+# `insumos/__init__.py` cuelgan todos de `insumos/` en el bucket, es decir, entradas.
+# Lo que el procedimiento PRODUCE no tenía destino declarado en ningún sitio: cada
+# módulo escribía en outputs/reporte y ahí se quedaba, en el disco de quien lo corrió.
+#
+# De eso vino el incidente del 25 de agosto de 2026. El encadenado del piloto redirige
+# en memoria la constante SALIDA de los módulos que escriben; una invocación directa de
+# `predios.lotes` contra el GeoJSON del piloto no la redirige, así que escribió sobre
+# outputs/reporte y machacó los lotes del reporte principal, que hubo que recaracterizar.
+#
+# La respuesta son estas tres cosas:
+#
+#   1. Cada corrida tiene su propia carpeta, `outputs/corridas/<nombre>`, y su propia
+#      carpeta de entregables, `entregables/<nombre>`. Dos corridas distintas no pueden
+#      compartir destino porque el destino sale del nombre, y el nombre es obligatorio.
+#   2. `outputs/reporte` y la raíz de `entregables/` quedan fuera del alcance de
+#      cualquier corrida: `destino_corrida` y `destino_entregables` los rechazan.
+#   3. Cada cosa que se produce sabe a qué prefijo del bucket va (CONJUNTOS_SALIDA), de
+#      modo que el resultado no viva solo en local.
+
+#: Raíz de las corridas. Una subcarpeta por corrida, nunca compartida.
+CORRIDAS_DIR = OUTPUTS_DIR / "corridas"
+
+#: Raíz de los entregables. Cada corrida escribe en su propia subcarpeta.
+ENTREGABLES_DIR = PROJECT_ROOT / "entregables"
+
+#: Carpetas que ninguna corrida puede tomar como destino. La primera es la salida del
+#: proyecto real; la segunda, la carpeta que se comparte con el cliente.
+DESTINOS_PROHIBIDOS = (OUTPUTS_DIR / "reporte", ENTREGABLES_DIR)
+
+#: Bucket y prefijo donde se publica lo que produce el procedimiento. Desde la migración
+#: al proyecto propio, las salidas tienen su propio bucket en vez de un prefijo dentro
+#: del de entradas: lo que entra y lo que sale se borran, se versionan y se comparten con
+#: criterios distintos, y separarlos evita que un borrado de salidas toque los insumos.
+BUCKET_SALIDAS = "salidas"
+PREFIJO_SALIDAS = "corridas"
+
+#: Qué produce el procedimiento, en qué paso, y si se publica en el bucket.
+#: (clave, paso, patrones dentro de la carpeta de la corrida, publicar, descripción)
+#:
+#: Los patrones son globs relativos a `destino_corrida(nombre)`. Un patrón que no case
+#: con nada no es un error: puede ser un paso que no se corrió en este tramo.
+CONJUNTOS_SALIDA = [
+    ("grillas", 1, ("grillas_para_predios.geojson",), True,
+     "Las grillas de entrada, normalizadas y con las columnas que hereda el lote"),
+    ("maestra", 1, ("grillas_candidatas.gpkg", "grillas_candidatas.geojson",
+                    "grillas_candidatas.csv"), False,
+     "Copia de la tabla maestra de grillas candidatas; es insumo, ya está en el bucket"),
+    ("catastro", 2, ("predios.gpkg", "predios.corte"), True,
+     "Consolidado catastral del IGAC de las celdas, reparado, recortado y medido"),
+    ("lotes", 3, ("lotes.gpkg", "lotes_*.csv", "lotes_*.geojson"), True,
+     "Lotes caracterizados por perfil: forma, terreno, entorno, POT, jurídico y valor"),
+    ("matricula", 4, ("matriculas_*.csv",), True,
+     "Auditoría de matrícula inmobiliaria por lote, con la vía y el motivo de cada una"),
+    ("visor", 5, ("reporte_predios.json", "reporte_predios.html"), True,
+     "El visor de lotes: el JSON de datos y el HTML que lo lleva dentro"),
+    ("excel", 6, ("lotes_*.xlsx",), True,
+     "Libro de Excel con la hoja de grillas y la hoja de lotes"),
+    ("bitacora", 7, ("_corrida.json", "_corrida.log"), True,
+     "Manifiesto y registro de la corrida: qué paso corrió, cuánto tardó y qué falló"),
+]
+
+#: Lo que se publica de la carpeta de entregables de la corrida.
+PATRONES_ENTREGABLE = ("*.html", "*.md")
+
+
+def nombre_corrida(nombre: str) -> str:
+    """
+    Valida el nombre de una corrida. Es la primera defensa contra que una corrida
+    escriba donde no debe: si el nombre pudiera llevar separadores o `..`, el destino
+    podría salirse de outputs/corridas y aterrizar en cualquier parte.
+    """
+    n = (nombre or "").strip()
+    if not n:
+        raise ValueError("El nombre de la corrida no puede estar vacío.")
+    if not all(c.isalnum() or c in "-_." for c in n) or n.startswith("."):
+        raise ValueError(
+            f"Nombre de corrida no válido: {nombre!r}. Se admiten letras, dígitos, "
+            "guion, guion bajo y punto; ni separadores de ruta ni '..'.")
+    return n
+
+
+def _comprobar_destino(ruta: Path, raiz: Path, etiqueta: str) -> Path:
+    """Comprueba que un destino cuelga de su raíz y no es una carpeta prohibida."""
+    ruta = ruta.resolve()
+    if ruta.parent != raiz.resolve():
+        raise ValueError(f"{etiqueta} {ruta} no cuelga de {raiz}")
+    for prohibida in DESTINOS_PROHIBIDOS:
+        if ruta == prohibida.resolve():
+            raise ValueError(
+                f"{etiqueta} {ruta} es una carpeta del proyecto real y no puede ser "
+                "destino de una corrida.")
+    return ruta
+
+
+def destino_corrida(nombre: str) -> Path:
+    """Carpeta de trabajo de una corrida: outputs/corridas/<nombre>."""
+    return _comprobar_destino(CORRIDAS_DIR / nombre_corrida(nombre), CORRIDAS_DIR,
+                              "El destino")
+
+
+def destino_entregables(nombre: str) -> Path:
+    """Carpeta de entregables de una corrida: entregables/<nombre>."""
+    return _comprobar_destino(ENTREGABLES_DIR / nombre_corrida(nombre), ENTREGABLES_DIR,
+                              "El entregable")
+
+
+def prefijo_corrida(nombre: str) -> str:
+    """Prefijo en el bucket: salidas/<nombre>."""
+    return f"{PREFIJO_SALIDAS}/{nombre_corrida(nombre)}"
+
+
+def salidas_del_paso(destino: Path, paso: int) -> list[tuple[str, Path, str]]:
+    """
+    Devuelve [(clave, ruta local, descripción)] de lo que produce un paso y se publica.
+
+    Solo lo que existe en disco. Lo que no esté no se inventa ni se da por hecho: si un
+    paso no dejó su archivo, aquí no aparece y el manifiesto lo dirá.
+    """
+    destino = Path(destino)
+    fuera = []
+    for clave, n, patrones, publicar, desc in CONJUNTOS_SALIDA:
+        if n != paso or not publicar:
+            continue
+        for patron in patrones:
+            for f in sorted(destino.glob(patron)):
+                if f.is_file():
+                    fuera.append((clave, f, desc))
+    return fuera
+
+
+# --------------------------------------------------------------------------
 # CRS usados en el proyecto
 # --------------------------------------------------------------------------
 

@@ -1,0 +1,251 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Prospectos Solares · del panel a las grillas",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "database": {
+          "label": "Dato guardado"
+        },
+        "external": {
+          "label": "Fuente externa"
+        },
+        "backend": {
+          "label": "Paso del modelo"
+        },
+        "messagebus": {
+          "label": "Entrega al pipeline"
+        }
+      }
+    },
+    "views": [
+      {
+        "id": "como-se-eligen",
+        "label": "Cómo se eligen las grillas",
+        "focus": [
+          "panel",
+          "granjas_sub",
+          "filtro",
+          "similitud",
+          "top"
+        ],
+        "note": "Las granjas ya construidas son el perfil positivo. Cada celda del país se puntúa por parecido con ese perfil."
+      },
+      {
+        "id": "que-se-reproduce",
+        "label": "Qué se reproduce",
+        "focus": [
+          "similitud",
+          "top",
+          "bayes"
+        ],
+        "note": "La selección es aritmética y repite idéntico. La validación bayesiana es muestreo y repite parecido."
+      },
+      {
+        "id": "la-frontera",
+        "label": "La frontera con el pipeline",
+        "focus": [
+          "top",
+          "reporte",
+          "entrega"
+        ],
+        "note": "Aquí termina lo exploratorio de los cuadernos y empieza lo productivo de ejecutar.py."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "insumos",
+      "label": "Insumos del modelo"
+    },
+    {
+      "id": "cuadernos",
+      "label": "Cuadernos 1, 1.1 y 1.2"
+    },
+    {
+      "id": "productivo",
+      "label": "Del modelo al pipeline"
+    }
+  ],
+  "phases": [
+    {
+      "id": "preparar",
+      "label": "Preparar",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "puntuar",
+      "label": "Puntuar y elegir",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "entregar",
+      "label": "Entregar",
+      "fromCol": 4,
+      "toCol": 5
+    }
+  ],
+  "mainPath": [
+    "panel",
+    "covariables",
+    "filtro",
+    "similitud",
+    "top",
+    "reporte",
+    "entrega"
+  ],
+  "nodes": [
+    {
+      "id": "panel",
+      "lane": "insumos",
+      "col": 0,
+      "type": "database",
+      "label": "Panel de grillas",
+      "sublabel": "una fila por celda del país",
+      "width": 118
+    },
+    {
+      "id": "granjas_sub",
+      "lane": "insumos",
+      "col": 1,
+      "type": "external",
+      "label": "Granjas y red",
+      "sublabel": "XM y subestaciones del SIN",
+      "width": 118
+    },
+    {
+      "id": "covariables",
+      "lane": "cuadernos",
+      "col": 0,
+      "type": "database",
+      "label": "Covariables",
+      "sublabel": "capas y faltantes resueltos",
+      "width": 118
+    },
+    {
+      "id": "filtro",
+      "lane": "cuadernos",
+      "col": 1,
+      "type": "backend",
+      "label": "Filtro espacial",
+      "sublabel": "buffer de subestaciones",
+      "width": 118
+    },
+    {
+      "id": "similitud",
+      "lane": "cuadernos",
+      "col": 2,
+      "type": "backend",
+      "label": "Similitud",
+      "sublabel": "perfil Mahalanobis y vecino",
+      "width": 118
+    },
+    {
+      "id": "top",
+      "lane": "cuadernos",
+      "col": 3,
+      "type": "database",
+      "label": "100 candidatas",
+      "sublabel": "top_candidates.gpkg",
+      "width": 114
+    },
+    {
+      "id": "bayes",
+      "lane": "cuadernos",
+      "col": 4,
+      "type": "backend",
+      "label": "Validación",
+      "sublabel": "MBG bayesiano",
+      "width": 96
+    },
+    {
+      "id": "reporte",
+      "lane": "productivo",
+      "col": 4,
+      "type": "backend",
+      "label": "Reporte de grillas",
+      "sublabel": "cruza fuentes y clasifica",
+      "width": 142
+    },
+    {
+      "id": "entrega",
+      "lane": "productivo",
+      "col": 5,
+      "type": "messagebus",
+      "label": "Entrega",
+      "sublabel": "grillas_para_predios.geojson",
+      "width": 120
+    }
+  ],
+  "edges": [
+    {
+      "from": "panel",
+      "to": "covariables"
+    },
+    {
+      "from": "covariables",
+      "to": "filtro"
+    },
+    {
+      "from": "granjas_sub",
+      "to": "filtro",
+      "label": "buffer",
+      "role": "branch"
+    },
+    {
+      "from": "granjas_sub",
+      "to": "similitud",
+      "label": "perfil positivo",
+      "role": "branch"
+    },
+    {
+      "from": "filtro",
+      "to": "similitud",
+      "variant": "emphasis"
+    },
+    {
+      "from": "similitud",
+      "to": "top",
+      "variant": "emphasis"
+    },
+    {
+      "from": "top",
+      "to": "bayes",
+      "label": "validación",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "from": "top",
+      "to": "reporte"
+    },
+    {
+      "from": "reporte",
+      "to": "entrega"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Dónde está la frontera",
+      "items": [
+        "Cuadernos exploratorios, pipeline productivo; la costura es top_candidates.gpkg",
+        "reporte/datos.py falla en seco: «Corre antes el notebook 1»"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Qué se reproduce",
+      "items": [
+        "Las 100 grillas no tienen semilla ni muestreo: repiten idénticas",
+        "pm.sample va sin random_seed: repite parecida, no idéntica"
+      ]
+    }
+  ]
+}

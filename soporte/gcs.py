@@ -20,6 +20,8 @@ USO DESDE LA LÍNEA DE COMANDOS
     python gcs.py ls geoinfo Colombia/      # lista bajo un prefijo
     python gcs.py get geoinfo ruta/al.geojson
     python gcs.py tree geoinfo              # estructura de carpetas de primer nivel
+    python gcs.py put prospectos salidas/general/lotes.gpkg outputs/corridas/general/lotes.gpkg
+    python gcs.py sync prospectos salidas/general outputs/corridas/general "*.csv"
 
 USO DESDE UN NOTEBOOK
 ---------------------
@@ -44,19 +46,38 @@ import os
 import sys
 from pathlib import Path
 
-PROYECTO_GCP = "mmc-general"
+#: Proyecto de GCP propio. Antes el trabajo vivía en mmc-general, junto a lo del resto
+#: del equipo; el 26 de agosto de 2026 se migró a su propio proyecto para que corra solo
+#: y no dependa de los buckets compartidos.
+PROYECTO_GCP = "prospectos-solares"
 
 #: Buckets del proyecto. La clave es el alias corto que se usa en el código.
+#:
+#: `geoinfo` ya no es el bucket compartido del equipo: son las capas base que este
+#: procedimiento de verdad usa (base veredal, límite departamental, subestaciones y
+#: registro de plantas), copiadas bajo el prefijo geoinfo/ del bucket de insumos. Son
+#: 368 MB de los 71 GB que pesaba el original, y así el proyecto no depende de otro.
 BUCKETS = {
-    "geoinfo": "geoinfo",
-    "prospectos": "prospectos_solares",
-    "backups": "backups-mmc",
+    "geoinfo": "prospectos-solares-insumos",
+    "prospectos": "prospectos-solares-insumos",
+    "salidas": "prospectos-solares-salidas",
 }
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+#: Prefijo que se antepone al pedir una capa del antiguo bucket compartido, porque
+#: dentro del bucket de insumos vive bajo geoinfo/.
+PREFIJO = {"geoinfo": "geoinfo/"}
+
+#: Raíz del proyecto: la carpeta que contiene a soporte/, no la de este archivo.
+#: Estaba mal apuntada y por eso la caché de este módulo crecía en soporte/data,
+#: mientras config.py, insumos/ y el resto del proyecto buscaban en data/. Dos cachés
+#: para lo mismo, y la de soporte/ invisible para todo lo demás.
+RAIZ_PROYECTO = Path(__file__).resolve().parent.parent
+
+#: Compatibilidad con el nombre anterior.
+PROJECT_ROOT = RAIZ_PROYECTO
 
 #: Caché local. Replica la estructura del bucket bajo data/<bucket>/...
-CACHE_DIR = PROJECT_ROOT / "data"
+CACHE_DIR = RAIZ_PROYECTO / "data"
 
 
 # --------------------------------------------------------------------------
@@ -160,8 +181,14 @@ def obtener(bucket: str, objeto: str, forzar: bool = False, verbose: bool = True
     Con forzar=True se descarga siempre.
     """
     b = _nombre_bucket(bucket)
-    destino = CACHE_DIR / b / objeto
-    blob = cliente().bucket(b).blob(objeto)
+    # Las capas que antes vivían en el bucket compartido ahora cuelgan de geoinfo/ dentro
+    # del bucket de insumos. El prefijo se pone aquí para que las llamadas del resto del
+    # proyecto sigan escritas igual y la migración no obligue a tocarlas una a una.
+    objeto_real = PREFIJO.get(bucket, "") + objeto
+    # La caché local conserva la ruta SIN prefijo, para que lo ya descargado siga valiendo
+    # y el resto del código lo siga encontrando donde lo busca.
+    destino = CACHE_DIR / bucket / objeto
+    blob = cliente().bucket(b).blob(objeto_real)
 
     if not forzar and destino.exists():
         try:
@@ -269,6 +296,38 @@ def borrar_prefijo(bucket: str, prefijo: str, verbose: bool = True) -> int:
     return n
 
 
+def publicar(bucket: str, prefijo: str, archivos, forzar: bool = False,
+             verbose: bool = True) -> dict:
+    """
+    Publica una lista concreta de archivos bajo un prefijo y devuelve el parte.
+
+    A diferencia de `subir_carpeta`, que barre una carpeta con un patrón, aquí se dice
+    exactamente qué se sube. Es lo que necesita el hilo conductor: cada paso conoce sus
+    propias salidas y publica esas, no lo que se encuentre al lado.
+
+    Nunca lanza. Si no hay credenciales o el bucket rechaza un objeto, lo deja escrito en
+    `errores` y sigue con el resto. Un paso no se da por publicado si no lo está: el
+    parte que devuelve es lo que acaba en el manifiesto de la corrida.
+
+        {"subidos": [gs://...], "ya_estaban": [...], "errores": [(ruta, motivo)]}
+    """
+    parte = {"subidos": [], "ya_estaban": [], "errores": []}
+    b = _nombre_bucket(bucket)
+    for f in archivos:
+        f = Path(f)
+        objeto = f"{prefijo.rstrip('/')}/{f.name}"
+        try:
+            if subir(bucket, objeto, f, forzar=forzar, verbose=verbose):
+                parte["subidos"].append(f"gs://{b}/{objeto}")
+            else:
+                parte["ya_estaban"].append(f"gs://{b}/{objeto}")
+        except Exception as exc:
+            parte["errores"].append((str(f), f"{type(exc).__name__}: {exc}"))
+            if verbose:
+                print(f"  AVISO sin publicar {f.name}: {type(exc).__name__}: {exc}")
+    return parte
+
+
 def subir_carpeta(bucket: str, prefijo: str, carpeta: Path, patron: str = "*",
                   forzar: bool = False, verbose: bool = True) -> int:
     """Sube el contenido de una carpeta bajo un prefijo. Devuelve cuántos subió."""
@@ -361,17 +420,37 @@ def _cmd_get(args) -> int:
     return 0
 
 
+def _cmd_put(args) -> int:
+    if len(args) < 3:
+        print("Uso: python gcs.py put <bucket> <objeto> <archivo_local> [--forzar]")
+        return 2
+    subido = subir(args[0], args[1], Path(args[2]), forzar="--forzar" in args)
+    print("subido" if subido else "ya estaba, no se reescribe (usa --forzar)")
+    return 0
+
+
+def _cmd_sync(args) -> int:
+    if len(args) < 3:
+        print("Uso: python gcs.py sync <bucket> <prefijo> <carpeta> [patron] [--forzar]")
+        return 2
+    patron = args[3] if len(args) > 3 and not args[3].startswith("--") else "*"
+    n = subir_carpeta(args[0], args[1], Path(args[2]), patron, forzar="--forzar" in args)
+    print(f"subidos {n} archivos")
+    return 0
+
+
 def main(argv: list[str]) -> int:
     if not argv or argv[0] in ("-h", "--help", "help"):
         print(__doc__)
         return 0
 
     cmd, args = argv[0], argv[1:]
-    acciones = {"auth": _cmd_auth, "ls": _cmd_ls, "tree": _cmd_tree, "get": _cmd_get}
+    acciones = {"auth": _cmd_auth, "ls": _cmd_ls, "tree": _cmd_tree, "get": _cmd_get,
+                "put": _cmd_put, "sync": _cmd_sync}
 
     if cmd not in acciones:
         print(f"Comando desconocido: {cmd}")
-        print("Comandos: auth, ls, tree, get")
+        print("Comandos: auth, ls, tree, get, put, sync")
         return 2
 
     try:

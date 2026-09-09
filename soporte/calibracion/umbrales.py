@@ -4,9 +4,14 @@ De dónde salen los umbrales de la matriz de criterios.
 Ninguno se puso a criterio propio. Los tres se leen de la distribución de las celdas del
 país que ya contienen una planta solar de la escala que se está prospectando:
 
-    tope   = percentil 10   el decil mejor de lo construido, vale 100 en el índice
-    bueno  = mediana        donde está la mitad de lo construido, vale 70
-    limite = percentil 90   más allá casi nadie ha construido, vale 0
+    tope   = el decil mejor de lo construido, vale 100 en el índice
+    bueno  = la mediana, donde está la mitad de lo construido, vale 70
+    limite = el decil peor de lo construido, vale 0
+
+Cuál percentil es cuál depende del sentido del criterio, y conviene no escribirlo
+al revés: donde menos es mejor, tope es el percentil 10 y límite el 90; donde más
+es mejor, como en producción fotovoltaica, la asignación se voltea. Eso es lo que
+hace la línea `ps = (P_TOPE, P_BUENO, P_LIMITE) if not mayor_mejor else ...`.
 
 Los números que salen de aquí se pegan a mano en CRITERIOS, dentro de reporte/datos.py.
 No se calculan en cada corrida a propósito. Hacerlo obligaría a leer el panel completo y

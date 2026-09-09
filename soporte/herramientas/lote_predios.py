@@ -111,8 +111,9 @@ def main(argv=None) -> int:
     print(f"  GeoJSON -> {gj}")
     print(f"  CSV     -> {csv}")
     print()
-    print("  Para el notebook 2:")
-    print(f"     python predios_igac.py --celdas outputs/reporte/{a.salida}.geojson")
+    print("  Siguiente paso:")
+    print(f"     python -m predios.lotes --celdas outputs/reporte/{a.salida}.geojson")
+    print(f"     python -m reporte_predios --grillas outputs/reporte/{a.salida}.geojson")
     return 0
 
 

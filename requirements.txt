@@ -1,4 +1,11 @@
-# Núcleo del proyecto: notebooks "1. Selección de grillas" y "2. IGAC_Consulta_Predios"
+# Núcleo del proyecto: notebooks "1. Selección de grillas" y "2. IGAC_Consulta_Predios",
+# el reporte de grillas, el procedimiento de lotes y el visor.
+#
+# PYTHON: 3.12. Es la versión con la que se desarrolló y se probó todo el proyecto
+# (3.12.10 en la máquina de referencia). 3.11 debería funcionar; 3.13 todavía no se ha
+# comprobado y algunas ruedas geoespaciales tardan en publicarse para cada versión
+# nueva. Comprobar con:  .venv\Scripts\python.exe --version
+#
 # Instalación:  pip install -r requirements.txt
 # El stack bayesiano (notebooks 1.1 y 1.2) va aparte, ver requirements-bayes.txt
 
@@ -34,3 +41,26 @@ openpyxl>=3.1
 
 # --- Jupyter ---
 ipykernel>=6.29
+
+# --- Lectura de PDF ---
+# pypdf lee los certificados de tradicion y arma el PDF del modelo.
+# pymupdf (se importa como `fitz`) lee las tablas de la Circular 054 de la UPME en
+# insumos/barras.py. Sin el, esa circular no se lee y la capacidad por barra queda
+# incompleta, sin error visible mas alla de un aviso.
+pymupdf>=1.24
+
+# --- Imagen ---
+# Pillow (se importa como PIL) compone el recorte satelital en insumos/sentinel.py.
+# Llega tambien como dependencia de contextily, pero el codigo lo importa directo,
+# asi que se declara.
+pillow>=10.0
+
+# Consulta de matricula en la Superintendencia (predios/matricula.py y
+# predios/matricula_auto.py). Se fija la version porque el binario del navegador que
+# descarga `playwright install` va emparejado con ella.
+#
+# TRAS INSTALAR HAY QUE BAJAR EL NAVEGADOR, una vez por maquina. pip no lo trae:
+#     .venv\Scripts\python.exe -m playwright install chromium
+# El codigo lanza el chromium empaquetado de playwright (headless), no el Chrome del
+# sistema, asi que sin ese paso el paso 4 falla al abrir el navegador.
+playwright==1.61.0

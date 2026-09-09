@@ -451,6 +451,22 @@ def main() -> int:
     print(f"\n  perfiles en el reporte: {', '.join(perfiles) or '—'}")
     print(f"  HTML -> {DESTINO}")
     print(f"  Tamaño: {len(html.encode('utf-8')) / 1024:.1f} KB")
+
+    # Copia a entregables/: el HTML se versiona; sus imágenes son insumo (bucket) y se
+    # dejan al lado para que el reporte se vea, sin entrar en git.
+    import shutil
+    entregables = config.PROJECT_ROOT / "entregables"
+    entregables.mkdir(exist_ok=True)
+    shutil.copy2(DESTINO, entregables / DESTINO.name)
+    copiadas = 0
+    for s in payload.get("satelital", {}).values():
+        origen = SALIDA / s["src"]
+        dest = entregables / s["src"]
+        if origen.exists() and (not dest.exists() or dest.stat().st_mtime < origen.stat().st_mtime):
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(origen, dest)
+            copiadas += 1
+    print(f"  copia -> {entregables / DESTINO.name}  (+ {copiadas} imágenes a entregables/satelital/)")
     return 0
 
 

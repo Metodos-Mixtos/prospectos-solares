@@ -8,6 +8,15 @@ venv/
 .venv/
 .env/
 .env
+# Credenciales: se bloquea cualquier variante, no solo .env exacto. Un fichero de
+# secretos que se cuele en un commit ya no se puede retirar del historial.
+.env.*
+*.env
+!.env.example
+credenciales*
+secretos*
+*.key
+*.pem
 
 # Rutas locales de cada máquina, ver config.py
 paths.local.json
@@ -85,15 +94,48 @@ client_secrets.json
 *.key
 
 # ------------------------------------------------------------------
-# Excepción: el reporte generado sí va al repositorio
+# Excepción: los reportes generados sí van al repositorio
 # ------------------------------------------------------------------
-# entregables/ es el producto, no un dato intermedio: es lo que se le enseña al cliente
-# y lo que alguien quiere abrir sin instalar nada ni correr el pipeline. Por eso escapa
-# de las reglas de arriba, incluidas las imágenes satelitales que necesita para verse.
-#
-# AVISO. Son unos 27 MB, y git guarda una copia entera cada vez que cambian. Actualizarlo
-# en cada iteración engorda el historial deprisa, así que conviene subirlo cuando hay una
-# versión que de verdad se va a compartir y no en cada retoque. Si acaba pesando, la
-# salida es publicarlo como release de GitHub en vez de versionarlo.
+# entregables/ es el producto: los HTML que se le enseñan al cliente. Solo los HTML.
+# Las imágenes satelitales que necesitan para verse son datos y viven en el bucket
+# (gs://prospectos_solares/insumos/satelital/); al generar el reporte se bajan a
+# entregables/satelital/ en la máquina de quien lo genera, y no se versionan.
 !entregables/
-!entregables/**
+!entregables/*.html
+!entregables/*.md
+# "!entregables/" reactiva la carpeta entera, y eso alcanza tambien a lo que cuelga
+# de ella: sin las dos lineas siguientes, entregables/satelital/ quedaba fuera de la
+# exclusion y sus imagenes acababan versionadas. Son datos y viven en el bucket.
+entregables/*/
+entregables/satelital/
+
+# ---------------------------------------------------------------------------
+# Al repositorio va el CODIGO y la DOCUMENTACION. Nada mas.
+#
+# Los datos, los reportes y los entregables se producen en la maquina de quien
+# corre el procedimiento y se publican en el bucket del proyecto. No se
+# versionan: pesan cientos de megas, caducan con cada corrida y dos personas
+# nunca tendrian la misma copia.
+# ---------------------------------------------------------------------------
+
+# Entregables: reportes HTML, presentaciones e imagenes. Se generan con
+# `ejecutar.py` y con `python -m reporte`, y se publican en
+# gs://prospectos-solares-salidas/corridas/<corrida>/
+entregables/
+
+# Certificados de tradicion y libertad: traen nombres y cedulas.
+insumos/certificados/
+
+# Insumos de la corrida piloto: son datos, no codigo.
+insumos/Piloto/
+
+# Sesiones y worktrees del asistente
+.claude/
+
+# Borradores de revision
+_rev/
+
+# Capturas sueltas de exploracion
+_*_cap/
+_*_capture/
+_verif_*/

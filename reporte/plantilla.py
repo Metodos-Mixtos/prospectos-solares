@@ -23,10 +23,10 @@ PLANTILLA = r"""<title>Grillas candidatas para granjas solares</title>
 :root{
   --brand:#18919C;
   --ground:#F9FBFB; --surface:#FFFFFF; --surface-2:#F2F4F5; --surface-3:#E9ECEC;
-  --ink:#1E2829; --ink-2:#49585A; --ink-3:#7F8E90;
+  --ink:#1E2829; --ink-2:#49585A; --ink-3:#5E6B6D;
   --line:#DFE2E2; --line-2:#C8CFD0;
-  --accent:#157F88; --accent-2:#0F5E65; --accent-soft:#E2F0F1;
-  --good:#3D7A5A; --warn:#B0761E; --bad:#A8492F;
+  --accent:#14767E; --accent-2:#0F5E65; --accent-soft:#E2F0F1;
+  --good:#3B7657; --warn:#926219; --bad:#A8492F;
   --good-bg:#E7F1EB; --warn-bg:#F8EFDC; --bad-bg:#F7E6E1;
   --rad1:#F4E3C1; --rad2:#EDC988; --rad3:#E3A44E; --rad4:#D17B2C; --rad5:#B44E18;
   --map-land:#EDF0F0; --map-line:#CFD6D6;
@@ -37,7 +37,7 @@ PLANTILLA = r"""<title>Grillas candidatas para granjas solares</title>
   :root{
     --brand:#22A4B0;
     --ground:#131818; --surface:#1C2323; --surface-2:#262E2E; --surface-3:#313A3A;
-    --ink:#E6EAEA; --ink-2:#ADB7B8; --ink-3:#7D8B8C;
+    --ink:#E6EAEA; --ink-2:#ADB7B8; --ink-3:#7E8C8D;
     --line:#303A3B; --line-2:#404D4F;
     --accent:#35AAB5; --accent-2:#5EC4CE; --accent-soft:#123539;
     --good:#71B593; --warn:#DCA950; --bad:#D87F66;
@@ -51,7 +51,7 @@ PLANTILLA = r"""<title>Grillas candidatas para granjas solares</title>
 :root[data-theme="dark"]{
   --brand:#22A4B0;
   --ground:#131818; --surface:#1C2323; --surface-2:#262E2E; --surface-3:#313A3A;
-  --ink:#E6EAEA; --ink-2:#ADB7B8; --ink-3:#7D8B8C;
+  --ink:#E6EAEA; --ink-2:#ADB7B8; --ink-3:#7E8C8D;
   --line:#303A3B; --line-2:#404D4F;
   --accent:#35AAB5; --accent-2:#5EC4CE; --accent-soft:#123539;
   --good:#71B593; --warn:#DCA950; --bad:#D87F66;
@@ -64,10 +64,10 @@ PLANTILLA = r"""<title>Grillas candidatas para granjas solares</title>
 :root[data-theme="light"]{
   --brand:#18919C;
   --ground:#F9FBFB; --surface:#FFFFFF; --surface-2:#F2F4F5; --surface-3:#E9ECEC;
-  --ink:#1E2829; --ink-2:#49585A; --ink-3:#7F8E90;
+  --ink:#1E2829; --ink-2:#49585A; --ink-3:#5E6B6D;
   --line:#DFE2E2; --line-2:#C8CFD0;
-  --accent:#157F88; --accent-2:#0F5E65; --accent-soft:#E2F0F1;
-  --good:#3D7A5A; --warn:#B0761E; --bad:#A8492F;
+  --accent:#14767E; --accent-2:#0F5E65; --accent-soft:#E2F0F1;
+  --good:#3B7657; --warn:#926219; --bad:#A8492F;
   --good-bg:#E7F1EB; --warn-bg:#F8EFDC; --bad-bg:#F7E6E1;
   --rad1:#F4E3C1; --rad2:#EDC988; --rad3:#E3A44E; --rad4:#D17B2C; --rad5:#B44E18;
   --map-land:#EDF0F0; --map-line:#CFD6D6;
@@ -105,7 +105,7 @@ h1{font-family:"Bahnschrift","DIN Alternate","Avenir Next Condensed",system-ui,s
 .brand-text{display:flex; flex-direction:column; line-height:1.05}
 .brand-name{font-family:"Bahnschrift","DIN Alternate",system-ui,sans-serif; font-weight:600;
   font-size:16px; letter-spacing:.055em; text-transform:uppercase; color:var(--ink-2)}
-.brand-sub{font-size:9px; letter-spacing:.42em; text-transform:uppercase; color:var(--brand);
+.brand-sub{font-size:9px; letter-spacing:.42em; text-transform:uppercase; color:var(--accent);
   margin-top:3px; font-weight:600}
 
 .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(172px,1fr)); gap:12px; margin-bottom:28px}
@@ -266,7 +266,7 @@ tr.est-no td{background:color-mix(in srgb, var(--bad-bg) 45%, transparent)}
 .h-alta{color:var(--good)} .h-media{color:var(--warn)} .h-baja{color:var(--bad)}
 .h-nd{color:var(--ink-3); font-style:italic; border-bottom:0}
 
-/* lote de grillas para la busqueda de predios */
+/* lote de grillas para la busqueda de lotes catastrales */
 .ctrls.lote{margin-top:9px; padding-top:9px; border-top:1px dashed var(--line-2);
   align-items:center}
 .lote-lab{font-size:10.5px; letter-spacing:.07em; text-transform:uppercase;
@@ -284,12 +284,12 @@ tr.est-no td{background:color-mix(in srgb, var(--bad-bg) 45%, transparent)}
 .sat-img{width:100%; height:auto; display:block}
 .sat-svg{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
 .sat-cred{position:absolute; right:5px; bottom:4px; font-size:8.5px; line-height:1.3;
-  color:#fff; background:rgba(0,0,0,.42); padding:1.5px 5px; border-radius:2px;
+  color:#fff; background:rgba(0,0,0,.55); padding:1.5px 5px; border-radius:2px;
   letter-spacing:.02em}
 .f-k small{font-weight:400; text-transform:none; letter-spacing:0; opacity:.8}
 .f-item{border-top:1px solid var(--line); padding-top:6px}
-/* La reserva de Ley 2a condiciona pero rara vez impide, asi que avisa sin gritar.
-   Solo cuando cubre casi toda la grilla pasa al tono de alerta. */
+/* Avisos de la ficha: el condicionante se marca sin gritar y solo el impedimento
+   pasa al tono de alerta. */
 .f-item.f-aviso, .f-item.f-alerta{border-top:0; border-left:3px solid var(--warn);
   background:var(--warn-bg); padding:7px 10px; border-radius:0 5px 5px 0}
 .f-item.f-alerta{border-left-color:var(--bad); background:var(--bad-bg)}
@@ -308,7 +308,7 @@ tr.est-no td{background:color-mix(in srgb, var(--bad-bg) 45%, transparent)}
 .p-pre{background:var(--good-bg); color:var(--good)}
 .p-via{background:var(--warn-bg); color:var(--warn)}
 .p-rep{background:var(--bad-bg); color:var(--bad)}
-.p-des{background:var(--surface-3); color:var(--ink-3); text-decoration:line-through}
+.p-des{background:var(--surface-3); color:var(--ink-2); text-decoration:line-through}
 
 /* criterios y simulador */
 .crit-intro{font-size:12.5px; color:var(--ink-2); margin:0 0 12px}
@@ -548,7 +548,15 @@ table.proc th:hover{color:var(--ink-3)}
 table.proc td{font-size:12.5px; color:var(--ink-2); vertical-align:top; line-height:1.45}
 table.proc td b{color:var(--ink); font-weight:600}
 table.proc .mono{font-size:11.5px; background:var(--surface-2); padding:1px 4px; border-radius:2px}
+/* El enlace de la tabla de fuentes lleva subrayado propio y no el del navegador, para
+   que la fila siga leyendose como texto corrido y el enlace se distinga sin gritar. */
+table.proc a{color:var(--accent); text-decoration:none; border-bottom:1px solid var(--line-2)}
+table.proc a:hover{border-color:var(--accent); background:var(--accent-soft)}
+@media print{
+  table.proc a{color:var(--ink); border-bottom:1px solid var(--line-2)}
+}
 .warn-cell{color:var(--warn)!important; font-weight:600}
+.warn-cell a{color:var(--warn)!important}
 th.tr{text-align:right}
 td.tr{text-align:right}
 #tbarras td.num{font-family:"Cascadia Mono",Consolas,monospace; font-variant-numeric:tabular-nums}
@@ -562,6 +570,10 @@ td.tr{text-align:right}
 .aviso{font-size:13px; color:var(--ink-2); line-height:1.55; margin:13px 0 0;
   padding:12px 15px; background:var(--warn-bg); border-left:2px solid var(--warn); border-radius:2px}
 .aviso b{color:var(--ink)}
+.nota-escala{font-size:13px; color:var(--ink-2); line-height:1.55; margin:15px 0 0;
+  padding:12px 15px; background:var(--surface-2); border-left:2px solid var(--brand);
+  border-radius:2px}
+.nota-escala b{color:var(--ink)}
 
 .gaps{display:grid; grid-template-columns:repeat(auto-fit,minmax(262px,1fr)); gap:13px}
 .gap{background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--warn);
@@ -622,23 +634,25 @@ a{color:var(--accent)}
         <h3>Cómo se clasifica</h3>
         <p class="crit-intro">Cada grilla lleva escrito su motivo concreto, en la ficha y en
         la tabla.</p>
-        <div class="crit"><span class="pill p-des">Excluida</span>
-          <p>Tiene una o más restricciones que impiden el desarrollo.</p>
-          <div class="crit-n" id="c-des">__DES__</div></div>
-        <div class="crit"><span class="pill p-rep">Condicionada</span>
-          <p>Algún criterio queda <b>fuera de su límite</b>. El índice puede
-          ser alto, pero un solo criterio en rojo exige gestión adicional y no se deja
-          promediar con los demás.</p>
-          <div class="crit-n" id="c-rep">__REP__</div></div>
         <div class="crit"><span class="pill p-pre">Prioritaria</span>
           <p><b>Ningún criterio en rojo</b> y un índice de <b>__UMBRAL__ o más</b>. No se le
           pide alcanzar el objetivo en todos los criterios, que es una vara mucho más alta:
-          se le pide no tener problemas y sumar buen puntaje.</p>
+          se le pide no tener ningún criterio fuera de su límite y alcanzar el índice
+          de corte.</p>
           <div class="crit-n" id="c-pre">__PRE__</div></div>
         <div class="crit"><span class="pill p-via">Elegible</span>
           <p>Ningún criterio en rojo tampoco, pero el índice queda por debajo del corte.
           Sigue en juego y puede subir si cambian los umbrales o llega mejor información.</p>
           <div class="crit-n" id="c-via">__VIA__</div></div>
+        <div class="crit"><span class="pill p-rep">Condicionada</span>
+          <p>Algún criterio queda <b>fuera de su límite</b>. El índice puede
+          ser alto, pero un solo criterio en rojo exige gestión adicional y no se deja
+          promediar con los demás.</p>
+          <div class="crit-n" id="c-rep">__REP__</div></div>
+        <div class="crit"><span class="pill p-des">Excluida</span>
+          <p>Cumple al menos uno de los criterios de exclusión de la lista contigua,
+          que se aplican antes de puntuar nada.</p>
+          <div class="crit-n" id="c-des">__DES__</div></div>
       </div>
       <div class="card">
         <h3>Criterios para excluir una grilla</h3>
@@ -653,11 +667,19 @@ a{color:var(--accent)}
           <li><b>Conflicto armado.</b> Municipio con tres o más acciones bélicas desde 2022
             y al menos tres por cada mil km². Ninguna de las diez plantas de 50&nbsp;MW o más
             del país está en un municipio así.</li>
-          <li><b>Reserva de Ley 2ª.</b> Solo si cubre el 90% o más de la grilla. Por debajo
-            condiciona pero no impide, porque el lote se ubica fuera del polígono.</li>
         </ul>
       </div>
     </div>
+    <p class="nota-escala"><b>Esta escala califica grillas, no lotes.</b> Prioritaria, Elegible,
+    Condicionada y Excluida valoran una superficie de 25&nbsp;km² por su afinidad con las zonas
+    donde ya opera generación solar y por las figuras jurídicas que la cubren. El paso
+    siguiente, la selección de lotes dentro de cada grilla, trabaja con una escala distinta y
+    con otros nombres, <b>Idóneo</b>, <b>Viable con gestión</b> y <b>No viable</b>, porque
+    juzga las condiciones de un terreno concreto y el trámite que exige cada condición, no la
+    afinidad de una región. Las dos escalas no se corresponden entre sí: de las diez grillas
+    que se llevaron a la selección de lotes, una es Prioritaria, una Elegible y ocho
+    Condicionadas, y de las Condicionadas salieron lotes Idóneos. La clase de la grilla no
+    predice la del lote.</p>
   </section>
 
   <section>
@@ -684,9 +706,13 @@ a{color:var(--accent)}
     <div class="crit-pie-row">
       <p class="crit-nota">El <b>efecto medido</b> es cuánto separa esa variable a las grillas
       con planta del resto, en desviaciones estándar. Cuanto más separa, más pesa: el peso es
-      el efecto dividido por la suma de los seis. Se compara contra las 7.239 grillas que están
-      dentro del radio de una subestación, no contra el país entero, porque medido contra todo
+      el efecto dividido por la suma de los siete. Se compara contra las 7.239 grillas que están
+      dentro del radio de una subestación, de las cuales 71 ya tienen planta y 7.168 no, y no
+      contra las 21.447 del país entero, porque medido contra todo
       el territorio la cercanía a la red se contaba dos veces y su efecto subía de 0,52 a 0,79.
+      En el perfil distribuido el contraste no usa esas 71: usa el subconjunto de plantas de
+      0,5 a 5&nbsp;MW, que es el tramo que ese perfil prospecta, y por eso los efectos y los
+      pesos cambian al conmutar.
       Quedaron fuera variables de mayor efecto, como la privación relativa o la densidad de
       población, porque describen el entorno de las plantas y no la aptitud del terreno:
       usarlas como criterio sería replicar una decisión de mercado. Van en la ficha de cada
@@ -698,16 +724,16 @@ a{color:var(--accent)}
 
     <div class="nota-met">
       <h3>Nota metodológica</h3>
-      <p>Los umbrales no se pusieron a criterio propio. Se leen de las <b>__NREF__ grillas del
-      país que ya contienen una planta de 10&nbsp;MW o más</b>, que es la escala que se
-      prospecta:</p>
+      <p>Los umbrales no se pusieron a criterio propio. Se leen de las <b id="nm-ref">__NREF__
+      grillas del país que ya contienen una planta de 10&nbsp;MW o más</b>, que es la escala
+      que se prospecta:</p>
       <ul class="nm-puntos">
         <li><b>Límite</b>, vale 0. Su percentil 90: más allá casi nadie ha construido.</li>
         <li><b>Objetivo</b>, vale 70. Su mediana: aquí está la mitad de lo construido.</li>
         <li><b>Tope</b>, vale 100. Su percentil 10: el decil mejor de lo existente.</li>
       </ul>
       <p>La nota de cada criterio se interpola entre esos tres puntos, y el índice es la suma
-      de las seis notas por su peso. <b>No es un cumple o no cumple</b>: una grilla con la
+      de las siete notas por su peso. <b>No es un cumple o no cumple</b>: una grilla con la
       subestación a 15&nbsp;km saca 49 sobre 100, no cero ni todo. Y como los tres puntos no
       dependen de las grillas que se evalúen, <b>un índice de 78 significa lo mismo en
       cualquier corrida</b>.</p>
@@ -726,7 +752,7 @@ a{color:var(--accent)}
 
   <div class="kpis">
     <div class="kpi"><div class="kpi-lab">Grillas</div><div class="kpi-val">__N__</div>
-      <div class="kpi-note">de 7.168 candidatas puntuadas</div></div>
+      <div class="kpi-note" title="Las 7.239 grillas del panel dentro del radio de una subestación, menos las 71 que ya tienen planta">de 7.168 candidatas puntuadas</div></div>
     <div class="kpi g"><div class="kpi-lab">Prioritarias</div><div class="kpi-val" id="k-pre">__PRE__</div>
       <div class="kpi-note">lista corta, índice __UMBRAL__ o más</div></div>
     <div class="kpi w"><div class="kpi-lab">Elegibles</div><div class="kpi-val" id="k-via">__VIA__</div>
@@ -734,7 +760,7 @@ a{color:var(--accent)}
     <div class="kpi b"><div class="kpi-lab">Condicionadas</div><div class="kpi-val" id="k-rep">__REP__</div>
       <div class="kpi-note">exigen gestión adicional</div></div>
     <div class="kpi n"><div class="kpi-lab">Excluidas</div><div class="kpi-val" id="k-des">__DES__</div>
-      <div class="kpi-note">restricción que impide el desarrollo</div></div>
+      <div class="kpi-note">cumplen un criterio de exclusión</div></div>
     <div class="kpi"><div class="kpi-lab">Zonas</div><div class="kpi-val">__NZONAS__</div>
       <div class="kpi-note">agrupaciones de trabajo</div></div>
   </div>
@@ -773,7 +799,8 @@ a{color:var(--accent)}
 
   <section>
     <div class="sec-head"><h2>Las 100 grillas</h2>
-      <span class="sec-note">Ordenadas de más a menos apta. Se ven las diez primeras; baja
+      <span class="sec-note">Ordenadas por el índice de aptitud, de mayor a menor. Se ven las
+      diez primeras; baja
       con la rueda dentro de la tabla para el resto. Los filtros afectan también al mapa.</span></div>
     <div class="ctrls">
       <button class="chip" data-f="todas" aria-pressed="true">Todas</button>
@@ -788,7 +815,7 @@ a{color:var(--accent)}
       <span class="count" id="count"></span>
     </div>
     <div class="ctrls lote">
-      <span class="lote-lab">Lote para búsqueda de predios</span>
+      <span class="lote-lab">Selección para la búsqueda de lotes</span>
       <span class="lote-n" id="loteN">ninguna marcada</span>
       <button class="btn ghost" id="loteVisibles">Marcar las visibles</button>
       <button class="btn ghost" id="loteTop10">Marcar las 10 primeras</button>
@@ -799,7 +826,7 @@ a{color:var(--accent)}
     <div class="tablebox tabla-scroll">
       <table>
         <thead><tr>
-          <th class="th-chk" title="Marcar para el lote de búsqueda de predios">✓</th>
+          <th class="th-chk" title="Marcar para la selección de búsqueda de lotes">✓</th>
           <th data-k="ranking" data-t="n">#</th>
           <th data-k="id">Grilla</th>
           <th data-k="zona">Zona</th>
@@ -963,17 +990,19 @@ a{color:var(--accent)}
       </div>
       <div class="card">
         <h3>De dónde sale el cupo, y qué no dice</h3>
-        <p class="crit-intro">Los megavatios libres salen de los catorce informes de capacidad
-        por barra de la UPME, ciclo 2023-2024, publicados por la Circular 077 de 2024, con la
-        capacidad de cada barra año por año hasta 2037. La tabla usa la del año en curso.</p>
-        <p class="crit-pie"><b>Es el techo físico del nodo, no el cupo libre de hoy.</b> Mide
-        cuánta generación admite la barra según los límites de red, antes de descontar lo
-        asignado después en el propio ciclo, y una barra puede pasar de 0,2&nbsp;MW un año a 80
-        al siguiente cuando entra una obra de expansión. Sirve para descartar nodos saturados
-        y ordenar candidatas; para comprometer una conexión hay que radicar el estudio ante el
-        operador de red. El régimen además cambió: la Resolución CREG 101&nbsp;094 de 2025
-        movió esta información al Repositorio de Transportadores de la Ventanilla Única, que
-        exige registro, así que el ciclo 2023-2024 es el último dato abierto.</p>
+        <p class="crit-intro">Los megavatios libres salen de la Circular Externa UPME 054 de
+        2026 y su anexo (capacidad disponible por barra 2026-2039, 645 subestaciones), que
+        prevalece barra a barra sobre los catorce informes del ciclo 2023-2024 (Circular 077
+        de 2024); estos cubren las barras que la circular no trae, sobre todo las de media
+        tensión. La tabla usa la del año en curso.</p>
+        <p class="crit-pie"><b>Es la capacidad bajo el escenario crítico de la red, no el cupo
+        que se firma.</b> La circular no incorpora las obras de la Circular 042 de 2026 y
+        obras urgentes que la Resolución UPME 567 de 2026 programa entre 2026 y 2035, y una
+        barra puede pasar de 0,1&nbsp;MW un año a 80 al siguiente
+        cuando entra una obra de expansión. Sirve para descartar nodos saturados y ordenar
+        candidatas; para comprometer una conexión hay que radicar la solicitud: de 10&nbsp;MW en
+        adelante la asigna la UPME, por debajo el operador de red, y ya no rige el orden de
+        llegada (Resoluciones CREG 101&nbsp;071 y 101&nbsp;094 de 2025).</p>
       </div>
     </div>
   </section>
@@ -981,81 +1010,179 @@ a{color:var(--accent)}
 
   <section>
     <div class="sec-head"><h2>De dónde sale cada dato</h2>
-      <span class="sec-note">Con su fecha, porque no todos están igual de frescos.</span></div>
+      <span class="sec-note">Fuente, forma de asignación y fecha, fila por fila. Las
+      direcciones se comprobaron una a una el 24 de agosto de 2026.</span></div>
     <div class="tablebox">
       <table class="proc">
         <thead><tr><th>Dato</th><th>Fuente</th><th>Cómo se asigna a la grilla</th><th>Vigencia</th></tr></thead>
         <tbody>
+          <tr><td><b>Universo de selección</b></td>
+            <td>Panel nacional de 21.447 grillas de 25&nbsp;km², cruzado con las 499
+              subestaciones del Sistema Interconectado Nacional</td>
+            <td>Se retienen las 7.239 grillas que caen dentro del radio de alguna subestación.
+              De ellas, 71 ya contienen planta solar y fijan el perfil de referencia; las 7.168
+              restantes se puntúan por similitud y las 100 mejores forman esta cartera</td>
+            <td>Archivo del panel del 20 de febrero de 2026. Las 21.447 celdas se volvieron a
+              contar sobre el archivo el 24 de agosto de 2026</td></tr>
           <tr><td><b>Operador de red</b></td>
-            <td>Capa <span class="mono">Subestaciones.geojson</span>, 499 subestaciones del SIN, bucket <span class="mono">geoinfo</span></td>
-            <td>Subestación más cercana al centroide. Se usa <span class="mono">nombre_organizacion</span>, y donde falta se toma <span class="mono">nombre_propietario</span></td>
-            <td class="warn-cell">Mezcla de 2017 a 2021, y 159 registros sin fecha</td></tr>
+            <td>Capa de subestaciones del acervo geográfico del proyecto: 499 subestaciones
+              del Sistema Interconectado Nacional, 122 del sistema de transmisión nacional y
+              377 del regional</td>
+            <td>Subestación más cercana al centroide. Se toma la organización que la capa
+              declara como operadora y, donde ese dato viene vacío, el propietario
+              registrado</td>
+            <td class="warn-cell">Vigencias declaradas entre el 1 de enero de 2017 y el 30 de
+              diciembre de 2021, y 159 de los 499 registros sin fecha. Recuento del 24 de agosto
+              de 2026. No se enlaza porque no se pudo verificar una dirección pública estable
+              para esta capa</td></tr>
           <tr><td><b>Tensión y barras</b></td>
-            <td>Misma capa, campos <span class="mono">tension</span> y <span class="mono">configuracion</span></td>
+            <td>Misma capa: la tensión nominal y el esquema de barras que declara para cada
+              subestación</td>
             <td>De la misma subestación más cercana</td>
             <td class="warn-cell">Igual que arriba</td></tr>
           <tr><td><b>Recurso solar</b></td>
-            <td>Global Solar Atlas, siete capas ya agregadas al panel</td>
-            <td>Media de la grilla, sin valores faltantes</td>
-            <td>Serie climatológica de largo plazo</td></tr>
+            <td><a href="https://globalsolaratlas.info/map?c=8.0,-75.3,8" target="_blank" rel="noopener">Global
+              Solar Atlas</a>, de Solargis. Siete capas ya agregadas al panel: GHI, DNI, DIF,
+              GTI, PVOUT, inclinación óptima y temperatura</td>
+            <td>Media de la grilla, sin valores faltantes. Solo PVOUT entra en el índice; las
+              demás describen el recurso en la ficha</td>
+            <td>Serie climatológica de largo plazo, agregada al panel del 20 de febrero de 2026.
+              El portal publicaba la versión 2.13, de mayo de 2026, el 24 de agosto de 2026</td></tr>
           <tr><td><b>Figuras jurídicas</b></td>
-            <td>RUNAP, Parques Nacionales, resguardos indígenas y consejos comunitarios</td>
-            <td>Marca de sí o no por intersección, no porcentaje de área</td>
-            <td>RUNAP con corte de febrero de 2026</td></tr>
+            <td><a href="https://runap.parquesnacionales.gov.co/" target="_blank" rel="noopener">RUNAP</a>
+              y parques nacionales de Parques Nacionales Naturales; resguardos indígenas y
+              consejos comunitarios de la <a href="https://data-agenciadetierras.opendata.arcgis.com/"
+              target="_blank" rel="noopener">Agencia Nacional de Tierras</a></td>
+            <td>Marca de sí o no por intersección, no porcentaje de área. Cualquiera de las
+              cuatro excluye la grilla</td>
+            <td>Vienen agregadas en el panel del 20 de febrero de 2026. El RUNAP publicaba
+              1.908 áreas inscritas el 24 de agosto de 2026, así que la figura conviene
+              reconfirmarla antes de ir a terreno</td></tr>
           <tr><td><b>Conflicto armado</b></td>
-            <td>SIEVCAC del Centro Nacional de Memoria Histórica, datos.gov.co</td>
-            <td>Hechos del municipio desde 2022, en conteo y por mil km²</td>
-            <td class="warn-cell">La fuente geocodifica al municipio, no al sitio</td></tr>
-          <tr><td><b>Reserva de Ley 2ª</b></td>
-            <td>FeatureServer del MinAmbiente, SIAC datos abiertos</td>
-            <td>Superficie de la grilla dentro de la reserva, en hectáreas y porcentaje</td>
-            <td>Se cruza en vivo contra la geometría de cada grilla</td></tr>
+            <td><a href="https://www.datos.gov.co/Inclusi-n-Social-y-Reconciliaci-n/Sistema-de-Informaci-n-de-Eventos-de-Violencia-del/39qq-a72j"
+              target="_blank" rel="noopener">SIEVCAC del Centro Nacional de Memoria Histórica</a>,
+              publicado en el portal nacional de datos abiertos</td>
+            <td>Hechos del municipio desde 2022, en conteo y por mil km². Se une por código
+              DANE y no por nombre</td>
+            <td class="warn-cell">Descarga del 11 de agosto de 2026: 1.458 hechos desde 2022, el
+              último de enero de 2026. La fuente geocodifica al municipio, no al sitio</td></tr>
           <tr><td><b>Distancia a vía</b></td>
-            <td>OpenStreetMap vía Overpass</td>
-            <td>Del centroide al tramo más cercano, en dos jerarquías</td>
-            <td>Consulta en vivo</td></tr>
-          <tr><td><b>Pendiente y elevación</b></td>
-            <td>NASADEM, ya agregado al panel</td>
-            <td>Media de la grilla, más su desviación como medida de rugosidad</td>
-            <td>Estable</td></tr>
+            <td><a href="https://www.openstreetmap.org/#map=12/8.00/-75.30" target="_blank" rel="noopener">OpenStreetMap</a>
+              vía <a href="https://overpass-api.de/" target="_blank" rel="noopener">Overpass</a></td>
+            <td>Del centroide al tramo más cercano, en dos jerarquías: vía carrozable y vía
+              principal</td>
+            <td>Consultas del 10 y el 11 de agosto de 2026. OpenStreetMap se edita de forma
+              continua, así que el dato envejece por su cuenta</td></tr>
+          <tr><td><b>Líneas de transmisión</b></td>
+            <td><a href="https://www.openstreetmap.org/#map=12/8.00/-75.30" target="_blank"
+              rel="noopener">OpenStreetMap</a> vía <a href="https://overpass-api.de/"
+              target="_blank" rel="noopener">Overpass</a>, tomando los trazados que el mapa
+              etiqueta como línea eléctrica</td>
+            <td>Capa de contexto del mapa, separando las de 220&nbsp;kV o más de las de 50 a
+              220&nbsp;kV. No entra en el índice ni en la clasificación</td>
+            <td>Consulta del 10 de agosto de 2026: 3.909 tramos en el país, de los que 1.873
+              caen dentro del lienzo del mapa y se dibujan</td></tr>
+          <tr><td><b>Pendiente, elevación y rugosidad</b></td>
+            <td><a href="https://www.earthdata.nasa.gov/data/catalog/lpcloud-nasadem-hgt-001"
+              target="_blank" rel="noopener">NASADEM</a>, de la NASA y el USGS, ya agregado al panel</td>
+            <td>Media de la grilla, más la desviación de la elevación como medida de rugosidad.
+              La elevación media sobre 3.000&nbsp;m excluye la grilla por páramo</td>
+            <td>NASADEM Merged DEM Global 1 arc second, versión 001. Agregado al panel del 20 de
+              febrero de 2026</td></tr>
+          <tr><td><b>Cultivos de coca</b></td>
+            <td>Lámina de densidad de cultivos de coca agregada al panel. El proyecto no
+              conserva la ficha de origen del ráster</td>
+            <td>Cualquier valor mayor que cero excluye la grilla, sin umbral de densidad. 1.164
+              de las 21.447 celdas del panel tienen coca</td>
+            <td class="warn-cell">La propia capa se declara del año 2023, y esa etiqueta es
+              el único registro del año que conserva el proyecto. Agregada al panel del 20 de
+              febrero de 2026. Recuento del 24 de agosto de 2026</td></tr>
           <tr><td><b>Cobertura del suelo</b></td>
-            <td>ESRI Sentinel-2 Land Cover, nueve clases</td>
+            <td><a href="https://livingatlas.arcgis.com/landcover/" target="_blank" rel="noopener">Sentinel-2
+              10m Land Use/Land Cover de Esri</a>, nueve clases</td>
             <td>Porcentaje de cada clase, ponderado por su aptitud y normalizado sobre lo
               observado, descontando lo que tapó la nube</td>
-            <td>Anual</td></tr>
+            <td class="warn-cell">Serie anual. La lámina llega ya agregada al panel del 20 de
+              febrero de 2026 y el panel no conserva el año exacto de la lámina utilizada</td></tr>
+          <tr><td><b>Dosel arbóreo en 2000</b></td>
+            <td><a href="https://glad.earthengine.app/view/global-forest-change" target="_blank"
+              rel="noopener">Global Forest Change</a>, Hansen y otros, Universidad de Maryland</td>
+            <td>Porcentaje de la grilla con dosel en el año 2000. Se muestra tal cual y no se
+              resta de la cobertura de hoy, porque las dos capas miden cosas distintas</td>
+            <td>Lámina del año 2000, agregada al panel del 20 de febrero de 2026</td></tr>
           <tr><td><b>Capacidad en barra</b></td>
-            <td>Catorce informes de capacidad por barra de la UPME, Circular 077 de 2024</td>
+            <td><a href="https://docs.upme.gov.co/Normatividad/Circular_054_2026_y_anexos.pdf"
+              target="_blank" rel="noopener">Circular Externa UPME 054 de 2026</a> y su anexo;
+              completa con los catorce informes del ciclo 2023-2024, Circular 077 de 2024, en la
+              <a href="https://www.upme.gov.co/nosotros/biblioteca-juridica/circulares-upme/"
+              target="_blank" rel="noopener">biblioteca de circulares de la UPME</a></td>
             <td>Se cruza la subestación asignada por nombre base, tomando la barra de alta o de
               media tensión según el perfil de proyecto</td>
-            <td class="warn-cell">Ciclo 2023-2024, el último abierto. Cubre 67% de las
-              subestaciones del SIN</td></tr>
+            <td class="warn-cell">Circular radicada el 10 de junio de 2026, con capacidad por
+              barra de 2026 a 2039 para 645 subestaciones, contadas sobre el propio documento el
+              24 de agosto de 2026. Escenario crítico, sin las obras de la Circular 042 de 2026</td></tr>
+          <tr><td><b>Obras de expansión</b></td>
+            <td><a href="https://docs.upme.gov.co/Normatividad/567_2026.pdf" target="_blank"
+              rel="noopener">Resolución UPME 000567 de 2026</a></td>
+            <td>No entra en el índice. Sostiene la advertencia de que una barra sin cupo hoy
+              puede tenerlo cuando entre la obra</td>
+            <td>Resolución del 6 de agosto de 2026. Programa obras entre 2026 y 2035</td></tr>
           <tr><td><b>Privación relativa</b></td>
-            <td>Global Gridded Relative Deprivation Index de SEDAC, versión 1</td>
-            <td>Media de la grilla, escala 0 a 100 donde 100 es la mayor privación</td>
-            <td class="warn-cell">Periodo 2010-2020, índice global no comparable con el IPM
-              del DANE</td></tr>
+            <td><a href="https://doi.org/10.7927/3xxe-ap97" target="_blank" rel="noopener">Global
+              Gridded Relative Deprivation Index (GRDI)</a>, versión 1, de SEDAC y CIESIN</td>
+            <td>Media de la grilla, escala 0 a 100 donde 100 es la mayor privación. No entra en
+              el índice ni en las exclusiones</td>
+            <td class="warn-cell">Versión 1, periodo 2010-2020. Índice global, no comparable con
+              el IPM del DANE</td></tr>
+          <tr><td><b>Densidad de población y tiempo de viaje</b></td>
+            <td>Capas globales agregadas al panel. El proyecto no conserva la ficha de origen de
+              estas dos</td>
+            <td>Media de la grilla. Van a la ficha como contexto y no intervienen ni en el
+              índice ni en las exclusiones</td>
+            <td class="warn-cell">Sin fecha declarada. Panel del 20 de febrero de 2026</td></tr>
           <tr><td><b>Imagen satelital</b></td>
-            <td>Esri World Imagery, Maxar y Earthstar Geographics</td>
+            <td><a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
+              target="_blank" rel="noopener">Esri World Imagery</a>, con Vantor (antes Maxar) y
+              Earthstar Geographics</td>
             <td>Un recuadro por grilla con 15% de margen, a unos 7&nbsp;m por píxel, con el
               contorno real dibujado encima</td>
-            <td>Cada foto muestra su fecha de captura</td></tr>
+            <td>Cada foto lleva su fecha de captura. Van del 11 de agosto de 2009 al 1 de abril
+              de 2026, y 78 de las 100 son de 2021 o posterior</td></tr>
           <tr><td><b>Municipio y vereda</b></td>
-            <td>Base veredal del IGAC</td>
+            <td>Base veredal del IGAC en el acervo del proyecto. El IGAC publica su cartografía
+              en <a href="https://www.colombiaenmapas.gov.co/" target="_blank" rel="noopener">Colombia
+              en Mapas</a></td>
             <td>Cruce espacial del centroide; el conflicto se une por código DANE y no por
               nombre, porque el mismo municipio aparece escrito de varias formas</td>
-            <td>2024</td></tr>
+            <td class="warn-cell">El archivo no declara fecha de corte. Trae 34.230 polígonos
+              veredales de 1.120 municipios, recuento del 24 de agosto de 2026</td></tr>
+          <tr><td><b>Zonas de prospección</b></td>
+            <td>Cálculo propio sobre las 100 candidatas</td>
+            <td>Agrupamiento DBSCAN de los centroides, radio de 20&nbsp;km y mínimo de dos
+              grillas. Lo que no entra en ningún grupo queda como aislado</td>
+            <td>Derivado. Se recalcula en cada corrida</td></tr>
+          <tr><td><b>Umbrales y pesos</b></td>
+            <td>Celdas del panel que ya tienen planta solar en operación</td>
+            <td>Los umbrales son percentiles de esas celdas: 53 con planta de 10&nbsp;MW o más en
+              el perfil utility y 24 con planta de 0,5&nbsp;MW o más en el distribuido. El peso de
+              cada criterio es su d de Cohen dividida por la suma de las siete</td>
+            <td>Panel del 20 de febrero de 2026. Se recalculan cuando entran plantas
+              nuevas al registro de XM</td></tr>
           <tr><td><b>Potencial en MWp</b></td>
             <td>Cálculo propio</td>
-            <td>Hectáreas de cobertura apta, ajustadas por pendiente, a razón de 1,5&nbsp;ha por MWp</td>
-            <td>Derivado</td></tr>
+            <td>Hectáreas de cobertura apta, ajustadas por pendiente, a razón de 1,5&nbsp;ha por
+              MWp sobre las 2.500&nbsp;ha de la grilla</td>
+            <td>Derivado de las capas de arriba</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="aviso"><b>Dos advertencias.</b> La capa de subestaciones es un consolidado con
-    vigencias entre 2017 y 2021 y un tercio de los registros sin fecha, así que el operador
-    conviene confirmarlo antes de cualquier gestión comercial. Y el potencial en megavatios es
+    <p class="aviso"><b>Tres advertencias.</b> La capa de subestaciones es un consolidado con
+    vigencias entre 2017 y 2021 y 159 de sus 499 registros sin fecha, así que el operador
+    conviene confirmarlo antes de cualquier gestión comercial. El potencial en megavatios es
     el techo físico de la superficie apta, no una cartera de proyectos: sirve para dimensionar
-    la oportunidad de una zona y compararla con otra, no para prometer capacidad.</p>
+    la oportunidad de una zona y compararla con otra, no para prometer capacidad. Y tres capas
+    llegan agregadas en el panel sin año declarado: la cobertura del suelo, que sí pesa en el
+    índice, y la densidad de población y el tiempo de viaje, que solo describen el entorno.</p>
   </section>
 
 
@@ -1063,8 +1190,12 @@ a{color:var(--accent)}
     <b>Cómo leer esto.</b> El puntaje mide parecido con las zonas donde ya hay generación solar,
     no calidad del recurso. Las plantas existentes están en el percentil 68 de recurso solar del
     país pero en el 97 de densidad poblacional, así que el ranking premia sobre todo accesibilidad
-    e infraestructura. La clasificación en tres niveles sí aplica criterios físicos y jurídicos.
+    e infraestructura. La clasificación en cuatro niveles sí aplica criterios físicos y jurídicos.
     Una grilla mide 5×5&nbsp;km y no es un lote: es la unidad de búsqueda del paso siguiente.
+    El modelo de similitud con el que se preseleccionaron estas 100 grillas no tiene una medida
+    de precisión publicada: no hay validación cruzada ni curva ROC contra un conjunto de prueba
+    independiente. Lo que se puede comprobar aquí son los criterios, los umbrales y las fuentes,
+    que están todos escritos.
   </footer>
 </div>
 
@@ -1105,7 +1236,31 @@ function colorDe(g){
   if(modoColor==="zona")  return zonaColor[g.zona] || "var(--ink-3)";
   return radColor(g.pvout);
 }
-function fmt(v,d){ return (v==null||isNaN(v))?"—":Number(v).toFixed(d===undefined?0:d); }
+// Separadores en español: coma decimal y punto de millar. Toda cifra que el lector
+// interpreta como número pasa por aquí. No pasan las coordenadas, que se escriben con
+// punto porque es lo que esperan Google Maps y Google Earth, ni la geometría del SVG.
+function es(v,d){ return Number(v).toLocaleString("es-CO",
+  {minimumFractionDigits:d, maximumFractionDigits:d}); }
+function fmt(v,d){ return (v==null||isNaN(v))?"—":es(v, d===undefined?0:d); }
+// El proveedor de imagenes entrega la fecha de captura en mes/dia/ano, que en espanol
+// se lee al reves: 1/10/2026 parece el 1 de octubre y es el 10 de enero. Se reescribe a
+// dia/mes/ano. Lo que llegue en cualquier otra forma se deja tal cual, sin suponer nada.
+// Muchos nombres de subestacion ya traen la tension dentro, y al concatenarla otra vez
+// quedaba "Planeta Rica 110 kV, 110 kV". Solo se anade cuando el nombre no la dice ya.
+function conTension(nombre, kv){
+  const n = String(nombre||"");
+  if(!kv) return n;
+  const suf = fmt(kv) + " kV";
+  return n.replace(/\s+/g," ").toLowerCase().includes(suf.toLowerCase()) ? n : n + " · " + suf;
+}
+function fechaSat(v){
+  const s = String(v||"").trim();
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(!m) return s;
+  const mes = +m[1], dia = +m[2];
+  if(mes<1 || mes>12 || dia<1 || dia>31) return s;
+  return String(dia).padStart(2,"0")+"/"+String(mes).padStart(2,"0")+"/"+m[3];
+}
 
 // --- mapa ---
 const gdeps=document.getElementById("deps");
@@ -1262,7 +1417,7 @@ function acercarA(g, k=6){
 }
 
 // --- criterios editables ---
-// CRIT viene de reporte_grillas.py, así que la lógica de aquí y la de allí no pueden
+// CRIT lo escribe el paso de datos, así que la lógica de aquí y la de allí no pueden
 // divergir en los umbrales de partida. El descarte jurídico no aparece: manda sobre
 // todo y ningún umbral lo negocia.
 const CLAVES = Object.keys(CRIT);
@@ -1272,7 +1427,7 @@ CLAVES.forEach(k => U[k] = {bueno: CRIT[k].bueno, limite: CRIT[k].limite});
 const DEC = {"%":0, "kWh/kWp":0, "km":1, "°":1, "m":0};
 function fmtCrit(k, v){
   const u = CRIT[k].unidad;
-  return v.toFixed(DEC[u] === undefined ? 1 : DEC[u]) + (u === "°" ? "°" : " " + u);
+  return es(v, DEC[u] === undefined ? 1 : DEC[u]) + (u === "°" ? "°" : " " + u);
 }
 // --- perfil de proyecto -----------------------------------------------------------
 // Los dos perfiles viajan dentro del JSON, cada uno con sus umbrales y su rango de
@@ -1320,6 +1475,12 @@ function aplicarPerfil(nombre){
   });
   const et = document.getElementById("eyebrow-perfil");
   if(et) et.textContent = p.etiqueta;
+  // La nota metodologica cita el numero de plantas de referencia y su tamano. Los dos
+  // cambian con el perfil, asi que se reescriben aqui: dejarlos fijos hacia que el
+  // perfil distribuido mostrara las cifras del de utility.
+  const nmr = document.getElementById("nm-ref");
+  if(nmr) nmr.textContent = p.n_referencia + " grillas del país que ya contienen una planta de "
+    + String(p.mw_referencia).replace(".", ",") + " MW o más";
   const av = document.getElementById("aviso-perfil");
   if(av) av.innerHTML = p.aviso
     ? `<div class="aviso-p"><b>Sobre el punto de conexión.</b> ${p.aviso}</div>` : "";
@@ -1331,7 +1492,7 @@ function aplicarPerfil(nombre){
 // Utilidad en dos tramos: 0 en el limite, 70 en el objetivo, 100 en el tope. Los tres
 // puntos vienen de las plantas que ya operan, no de la cartera que se este mirando.
 //
-// Esta funcion tiene que dar exactamente lo mismo que utilidad() en reporte_grillas.py.
+// Esta funcion tiene que dar exactamente lo mismo que la utilidad del paso de datos.
 // Son dos copias de la misma formula, una en Python para los exports y otra aqui para
 // que la matriz recalcule sin recargar, y cuando se separan el navegador y el CSV
 // muestran clasificaciones distintas para la misma grilla.
@@ -1354,7 +1515,7 @@ function utilidad(k, v){
   cont.querySelectorAll("button").forEach(b=>
     b.addEventListener("click", ()=>aplicarPerfil(b.dataset.p)));
   const nota = document.getElementById("perfil-nota");
-  if(nota) nota.textContent = "Cambia los seis umbrales y el punto de conexión. "
+  if(nota) nota.textContent = "Cambia los siete umbrales y el punto de conexión. "
     + "Las exclusiones son las mismas en ambos.";
 })();
 
@@ -1377,9 +1538,9 @@ function pintarCalculo(){
       <td class="num esc">${fmtCrit(k,u.limite)}</td>
       <td class="num esc">${fmtCrit(k,u.bueno)}</td>
       <td class="num esc">${fmtCrit(k,c.tope)}</td>
-      <td class="num"><b>${nota.toFixed(1)}</b></td>
-      <td class="num">${(w*100).toFixed(1)}%</td>
-      <td class="num">${ap.toFixed(2)}</td></tr>`;
+      <td class="num"><b>${es(nota,1)}</b></td>
+      <td class="num">${es(w*100,1)}%</td>
+      <td class="num">${es(ap,2)}</td></tr>`;
   }).join("");
   el.innerHTML = `
     <p class="calc-cab">Grilla <span class="mono">${g.id}</span>, ${g.municipio},
@@ -1392,10 +1553,10 @@ function pintarCalculo(){
         <th class="tr">Nota</th><th class="tr">Peso</th><th class="tr">Aporte</th></tr></thead>
       <tbody>${filas}</tbody>
       <tfoot><tr><td colspan="7">Índice</td>
-        <td class="num"><b>${suma.toFixed(1)}</b></td></tr></tfoot>
+        <td class="num"><b>${es(suma,1)}</b></td></tr></tfoot>
     </table></div>
     <p class="calc-pie">La nota sale de interpolar entre los tres puntos de la escala. El
-    aporte es la nota por el peso, y el índice es la suma de los seis aportes.</p>`;
+    aporte es la nota por el peso, y el índice es la suma de los siete aportes.</p>`;
 }
 
 // --- competencia por barra ---------------------------------------------------------
@@ -1462,11 +1623,11 @@ function pintarBarras(){
     return `
     <tr class="est-${estado}">
       <td><b>${b.sub_nombre_subestacion}</b><span class="sub-mun">${b.municipio||""}</span></td>
-      <td class="tr num">${b.tension_kv==null?"—":b.tension_kv.toFixed(0)}</td>
-      <td class="tr num${cap==null?" pend":""}">${cap==null?"—":cap.toFixed(0)}</td>
+      <td class="tr num">${b.tension_kv==null?"—":es(b.tension_kv,0)}</td>
+      <td class="tr num${cap==null?" pend":""}">${cap==null?"—":es(cap,0)}</td>
       <td><span class="veredicto v-${estado}">${texto}</span></td>
       <td class="tr num"><b>${b.candidatas}</b>${b.prioritarias?'<small> · '+b.prioritarias+' pri.</small>':''}</td>
-      <td class="tr num">${b.km_medio==null?"—":b.km_medio.toFixed(1)}</td>
+      <td class="tr num">${b.km_medio==null?"—":es(b.km_medio,1)}</td>
       <td><span class="hol h-${cfg.nivel}" title="${cfg.desc}">${
         cfg.nivel==="nd"?"sin dato":"holgura "+cfg.nivel}</span></td>
     </tr>`;
@@ -1570,7 +1731,7 @@ function pintarMatriz(){
     const paso = c.unidad==="kWh/kWp" ? 10 : (c.unidad==="%" ? 1 : 0.5);
     return `<tr>
       <td><div class="cr-nom">${c.etiqueta}</div><div class="cr-uni">medido en ${c.unidad}</div></td>
-      <td><div class="cr-efecto"><span class="track"><span class="fill" style="width:${(c.d_cohen/dmax*100).toFixed(0)}%"></span></span><span class="val">${c.d_cohen.toFixed(2)}</span></div></td>
+      <td><div class="cr-efecto"><span class="track"><span class="fill" style="width:${(c.d_cohen/dmax*100).toFixed(0)}%"></span></span><span class="val">${es(c.d_cohen,2)}</span></div></td>
       <td class="tr"><input class="umbral obj" type="number" step="${paso}" value="${u.bueno}" data-k="${k}" data-tipo="bueno" aria-label="Objetivo de ${c.etiqueta}"></td>
       <td class="tr"><input class="umbral lim" type="number" step="${paso}" value="${u.limite}" data-k="${k}" data-tipo="limite" aria-label="Límite de ${c.etiqueta}"></td>
       <td>${histograma(k, 210, 34)}</td>
@@ -1623,12 +1784,19 @@ function pintarReparto(c){
 }
 
 // ===================================================================================
-// LOTE PARA BUSQUEDA DE PREDIOS
+// LOTE DE GRILLAS PARA LA BUSQUEDA DE LOTES
 // ===================================================================================
 // Consultar el FeatureServer del IGAC cuesta minutos por grilla, asi que no tiene
 // sentido lanzarlo sobre las cien. Aqui se marcan las que interesan y se descargan en
 // el formato que el notebook 2 espera como entrada: un GeoJSON con la geometria de cada
 // grilla y su cell_id, o un CSV con el contorno en WKT para quien prefiera tabla.
+//
+// El nombre del archivo descargado sigue siendo grillas_para_predios. Es lo unico del
+// entregable donde asoma la palabra "predio", y se deja a proposito: es el nombre de
+// contrato del pipeline. Lo esperan reporte_predios (GRILLAS_DEFECTO), predios.lotes,
+// los scripts del piloto, el cuaderno 2 y docs/PREDIOS.md. Cambiarlo solo aqui rompe
+// la ruta por defecto de los tres pasos siguientes. Si se decide renombrar, hay que
+// hacerlo en todos esos sitios a la vez.
 const LOTE = new Set();
 
 function pintarLote(){
@@ -1732,7 +1900,7 @@ function vistaSatelital(g, lado){
       <polygon points="${pts}" fill="none" stroke="#fff" stroke-width="3.4" opacity=".65"/>
       <polygon points="${pts}" fill="none" stroke="var(--brand)" stroke-width="1.9"/>
     </svg>
-    <span class="sat-cred">${SAT_FUENTE}${s.fecha?" · "+s.fecha:""}</span>
+    <span class="sat-cred">${SAT_FUENTE}${s.fecha?" · imagen del "+fechaSat(s.fecha):""}</span>
   </div>`;
 }
 
@@ -1850,7 +2018,7 @@ function fichaTecnica(g){
     return `<tr><td>${c.etiqueta}</td>
       <td class="num">${fmtCrit(k,v)}</td>
       <td class="num lim">${fmtCrit(k,c.limite)} / ${fmtCrit(k,c.bueno)}</td>
-      <td class="num"><b>${n.toFixed(0)}</b></td>
+      <td class="num"><b>${es(n,0)}</b></td>
       <td><span class="est ${est}">${est==="fuera"?"fuera de límite":(est==="cumple"?"cumple objetivo":"por debajo")}</span></td></tr>`;
   }).join("");
 
@@ -1896,7 +2064,7 @@ h2{font-size:10px; letter-spacing:.11em; text-transform:uppercase; color:var(--a
 .sat-img{width:100%; height:auto; display:block}
 .sat-svg{position:absolute; inset:0; width:100%; height:100%}
 .sat-cred{position:absolute; right:4px; bottom:3px; font-size:7px; color:#fff;
-  background:rgba(0,0,0,.45); padding:1px 4px; border-radius:2px}
+  background:rgba(0,0,0,.55); padding:1px 4px; border-radius:2px}
 .sit-cap{font-size:8px; fill:var(--ink-3); font-family:"Segoe UI",sans-serif;
   letter-spacing:.04em; text-transform:uppercase}
 table{width:100%; border-collapse:collapse; font-size:11px}
@@ -1972,6 +2140,10 @@ table.def .dd{color:var(--ink-3); line-height:1.45; font-size:9.5px}
   <div class="dato"><div class="dk">Potencial indicativo</div><div class="dv">${fmt(g.mwp)} <small>MWp</small></div></div>
   <div class="dato"><div class="dk">Energía anual</div><div class="dv">${fmt(g.gwh)} <small>GWh</small></div></div>
 </div>
+<div class="aviso">Las hectáreas aptas son una estimación, no un levantamiento de campo: salen
+de la cobertura del suelo leída sobre imagen satelital y ajustada por pendiente. El potencial y
+la energía son el techo físico de las 2.500 ha de la grilla y no una cartera de proyectos: no
+descuentan la propiedad del suelo ni comprueban que los terrenos estén disponibles.</div>
 
 <h2>Qué hay en el suelo</h2>
 <div class="datos">
@@ -2034,10 +2206,8 @@ table.def .dd{color:var(--ink-3); line-height:1.45; font-size:9.5px}
 <div class="aviso">${g.motivo}</div>
 ${g.restricciones && g.restricciones!=="Sin restricción registrada"
   ? `<div class="aviso"><b>Figura jurídica.</b> ${g.restricciones}</div>` : ""}
-${g.ley2>0 ? `<div class="aviso"><b>Reserva Forestal de Ley 2ª.</b> Cubre el ${g.ley2.toFixed(0)}%
-  de la grilla. El lote debe ubicarse fuera del polígono o tramitar sustracción ante el MADS.</div>` : ""}
 ${g.conf_n>0 ? `<div class="aviso"><b>Conflicto armado.</b> ${g.conf_n} acciones bélicas en el
-  municipio desde 2022, ${g.conf_d.toFixed(1)} por mil km².${g.conf_act?" Actores: "+g.conf_act+".":""}</div>` : ""}
+  municipio desde 2022, ${es(g.conf_d,1)} por mil km².${g.conf_act?" Actores: "+g.conf_act+".":""}</div>` : ""}
 
 <div class="pie">
   <span>Métodos Mixtos Consultores · ficha generada el ${hoy}</span>
@@ -2058,10 +2228,13 @@ function leyenda(){
       '<div class="ramp"><span style="background:var(--rad1)"></span><span style="background:var(--rad2)"></span>'+
       '<span style="background:var(--rad3)"></span><span style="background:var(--rad4)"></span>'+
       '<span style="background:var(--rad5)"></span></div>'+
-      '<div class="ramp-lab"><span>'+PVMIN.toFixed(0)+'</span><span>kWh/kWp/año</span><span>'+PVMAX.toFixed(0)+'</span></div>';
+      '<div class="ramp-lab"><span>'+es(PVMIN,0)+'</span><span>kWh/kWp/año</span><span>'+es(PVMAX,0)+'</span></div>';
   } else if(modoColor==="clase"){
-    const c={Preferente:0,Viable:0,"Con reparos":0}; D.forEach(g=>c[g.clase]++);
-    el.innerHTML='<h3>Clasificación</h3>'+Object.keys(c).map(k=>
+    // El contador se arma desde CLASES, la unica lista de clases vigente, para que no
+    // pueda volver a quedarse con nombres viejos y mostrar NaN en la leyenda.
+    const c={}; CLASES.forEach(k=>c[k]=0);
+    D.forEach(g=>{ if(c[g.clase]!=null) c[g.clase]++; });
+    el.innerHTML='<h3>Clasificación</h3>'+CLASES.map(k=>
       '<div class="legend-row"><span class="sw" style="background:'+COLCLASE[k]+'"></span>'+k+' · '+c[k]+'</div>').join("");
   } else {
     el.innerHTML='<h3>Zonas de prospección</h3>'+ZONAS.slice(0,10).map(z=>
@@ -2103,7 +2276,7 @@ function render(){
   D.forEach(g=>{
     g._el.classList.toggle("off",!ids.has(g.id));
     g._el.setAttribute("fill",colorDe(g));
-    g._el.setAttribute("r", g.clase==="Preferente"?6:5);
+    g._el.setAttribute("r", g.clase==="Prioritaria"?6:5);
   });
   document.getElementById("count").textContent=v.length+" de "+D.length+" grillas";
   document.getElementById("tb").innerHTML=v.map(g=>`
@@ -2138,26 +2311,10 @@ function render(){
     pintarLote();
   }));
   leyenda();
-}
-
-// Reserva Forestal de Ley 2a de 1959. No es una prohibicion como la de un parque: el
-// ministerio puede sustraer el area, y un proyecto solar ya cumple el requisito de
-// utilidad publica que ese tramite exige. Por eso lo que importa no es que la reserva
-// toque la grilla, sino cuanta superficie deja libre para sitiar el lote fuera de ella.
-function fichaLey2(g){
-  const pct = g.ley2 || 0;
-  if(!pct) return "";
-  const ha = Math.round(2500 * pct / 100);
-  const libre = 2500 - ha;
-  const tono = pct >= 90 ? "f-alerta" : "f-aviso";
-  return `<div class="f-item f-full ${tono}">
-    <div class="f-k">Reserva Forestal de Ley 2ª de 1959</div>
-    <div class="f-v sm">Cubre el ${pct.toFixed(pct<10?1:0)}% de la grilla, unas
-      ${ha.toLocaleString("es-CO")} ha. Quedan ${libre.toLocaleString("es-CO")} ha fuera
-      del polígono${pct>=90?"" : ", suficientes para ubicar el lote sin tramitar sustracción"}.
-      ${pct>=90?"No queda superficie utilizable fuera de la reserva." :
-        "Si la línea de conexión cruza la reserva, sí requiere sustracción temporal."}</div>
-  </div>`;
+  // El comparador tambien se repinta aqui. Sin esto se quedaba con las cifras del
+  // perfil anterior o con los umbrales viejos: la tabla de arriba decia una cosa y el
+  // enfrentamiento de dos grillas, otra, sobre la misma grilla y en la misma pantalla.
+  if(typeof pintarComparador === "function") pintarComparador();
 }
 
 // Acciones belicas del municipio. Va por municipio y no por distancia porque el CNMH
@@ -2171,7 +2328,7 @@ function fichaConflicto(g){
   return `<div class="f-item f-full ${fuera?"f-alerta":"f-aviso"}">
     <div class="f-k">Conflicto armado en el municipio</div>
     <div class="f-v sm">${n} ${n===1?"acción bélica registrada":"acciones bélicas registradas"}
-      desde 2022, ${d.toFixed(d<10?1:0)} por cada mil km².
+      desde 2022, ${es(d, d<10?1:0)} por cada mil km².
       ${g.conf_act?" Actores: "+g.conf_act+".":""}
       ${fuera?" Supera los dos umbrales, la grilla queda descartada."
              :" Por debajo del umbral que descarta, se reporta como contexto."}</div>
@@ -2203,14 +2360,13 @@ function sel(id){
     <div class="f-grid">
       <div class="f-item f-full"><div class="f-k">Figura jurídica</div><div class="f-v sm">${g.restricciones}</div></div>
       ${fichaConflicto(g)}
-      ${fichaLey2(g)}
       <div class="f-item"><div class="f-k">A la red</div><div class="f-v">${fmt(g.dist_sub,1)} <small>km</small></div></div>
       <div class="f-item"><div class="f-k">Cobertura apta</div><div class="f-v">${fmt(g.cobertura,0)}<small>%</small></div></div>
       <div class="f-item"><div class="f-k">Pendiente</div><div class="f-v">${fmt(g.pendiente,1)}<small>°</small></div></div>
       <div class="f-item"><div class="f-k">Producción FV</div><div class="f-v">${fmt(g.pvout)} <small>kWh/kWp</small></div></div>
       <div class="f-item"><div class="f-k">Rugosidad</div><div class="f-v">${fmt(g.rugosidad,0)} <small>m</small></div></div>
       <div class="f-item"><div class="f-k">A vía carrozable</div><div class="f-v">${g.via==null?"—":fmt(g.via,2)+" <small>km</small>"}</div></div>
-      <div class="f-item f-full"><div class="f-k">Punto de conexión</div><div class="f-v sm">${g.subestacion}${g.tension?" · "+fmt(g.tension)+" kV":""}</div></div>
+      <div class="f-item f-full"><div class="f-k">Punto de conexión</div><div class="f-v sm">${conTension(g.subestacion, g.tension)}</div></div>
     </div>
 
     <div class="f-sec">Potencial estimado</div>
@@ -2220,6 +2376,11 @@ function sel(id){
       <div class="f-item"><div class="f-k">Energía anual</div><div class="f-v">${fmt(g.gwh)} <small>GWh</small></div></div>
       <div class="f-item"><div class="f-k">Caben</div><div class="f-v">${g.proy20} <small>de 20 MW</small></div></div>
     </div>
+    <p class="f-nota">Las hectáreas aptas son una estimación, no un levantamiento de campo:
+    salen de la cobertura del suelo leída sobre imagen satelital y ajustada por pendiente.
+    El potencial y la energía son el techo físico de las 2.500 ha de la grilla y no una
+    cartera de proyectos: no descuentan la propiedad del suelo ni comprueban que los
+    terrenos estén disponibles.</p>
 
     ${SAT[g.id] ? '<div class="f-sec">Cómo se ve <span>imagen satelital</span></div>'
                   + vistaSatelital(g, 400) : ""}
@@ -2465,13 +2626,14 @@ document.getElementById("reset").addEventListener("click",()=>{
 
 document.getElementById("exportar").addEventListener("click",()=>{
   const cols=[["ranking","Ranking"],["id","Grilla"],["zona","Zona"],["clase","Clasificacion"],
-    ["motivo","Motivo"],["depto","Departamento"],["municipio","Municipio subestacion"],
+    ["motivo","Motivo"],["depto","Departamento"],["municipio","Municipio"],
+    ["vereda","Vereda"],
     ["pvout","Produccion FV kWh/kWp/ano"],["gti","GTI"],["mwp","MWp indicativo"],["ha","Hectareas aptas"],
     ["gwh","GWh ano"],["pendiente","Pendiente grados"],["elevacion","Elevacion m"],
     ["dist_sub","Km a subestacion"],["via","Km a via"],["via_pri","Km a via principal"],
     ["subestacion","Subestacion"],["tension","kV"],["barras","Configuracion barras"],
     ["operador","Operador"],["restricciones","Restricciones"],
-    ["ley2","Reserva Ley 2a pct de la grilla"],["lat","Latitud"],["lon","Longitud"]];
+    ["lat","Latitud"],["lon","Longitud"]];
   const esc=v=>{ if(v==null) return ""; const s=String(v); return /[";\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
   const filas=[cols.map(c=>c[1]).join(";")];
   visibles().forEach(g=>filas.push(cols.map(c=>esc(g[c[0]])).join(";")));
@@ -2494,12 +2656,13 @@ const FILAS_COMP = [
   {k:"indice",  lab:"Índice de aptitud",      dec:0, mayor:true,  suf:"/100"},
   {k:"cumple",  lab:"Criterios cumplidos",    dec:0, mayor:true,  suf:"/"+CLAVES.length},
   {sep:"Criterios que deciden"},
-  {k:"dist_sub", lab:"Distancia al punto de conexión", nota:"peso 0,79", dec:1, mayor:false, suf:" km"},
-  {k:"cobertura",lab:"Cobertura apta del suelo",       nota:"peso 0,73", dec:0, mayor:true,  suf:" %"},
-  {k:"pendiente",lab:"Pendiente media",                nota:"peso 0,69", dec:1, mayor:false, suf:"°"},
-  {k:"pvout",    lab:"Producción fotovoltaica",        nota:"peso 0,66", dec:0, mayor:true,  suf:" kWh/kWp"},
-  {k:"rugosidad",lab:"Rugosidad del relieve",          nota:"peso 0,57", dec:0, mayor:false, suf:" m"},
-  {k:"via",      lab:"Distancia a vía carrozable",     nota:"peso 0,45", dec:2, mayor:false, suf:" km"},
+  // Las filas de criterio se arman desde la misma lista que clasifica, no a mano. Antes
+  // estaban escritas una a una con siete criterios reducidos a seis, sin la capacidad
+  // libre en la barra, y con unos pesos de una calibración anterior que ya no era la
+  // vigente. Armándolas aquí no pueden volver a descuadrarse.
+  ...CLAVES.map(k=>({crit:k, lab:CRIT[k].etiqueta, mayor:CRIT[k].mayor_mejor,
+    dec: DEC[CRIT[k].unidad]===undefined ? 1 : DEC[CRIT[k].unidad],
+    suf: CRIT[k].unidad==="°" ? "°" : " "+CRIT[k].unidad})),
   {sep:"Potencial estimado"},
   {k:"ha",     lab:"Hectáreas aptas",   dec:0, mayor:true, suf:" ha"},
   {k:"mwp",    lab:"Potencial",         dec:0, mayor:true, suf:" MWp"},
@@ -2514,16 +2677,18 @@ const FILAS_COMP = [
   {k:"operador",   lab:"Operador de red",texto:true},
   {k:"barras",     lab:"Configuración de barras", texto:true},
   {k:"restricciones", lab:"Figura jurídica", texto:true},
-  {k:"ley2",       lab:"Reserva Ley 2ª",  dec:0, mayor:false, suf:" %"},
 ];
 
 function celdaComp(g, f, otro){
   if(f.texto) return `<td class="dato texto">${g[f.k] ?? "—"}</td>`;
-  const v = g[f.k], w = otro[f.k];
+  // El criterio se lee con valorDe, que es la que usa la clasificación: así la distancia
+  // al punto de conexión cambia con el perfil también aquí, y no queda la del otro.
+  const v = f.crit ? valorDe(g,f.crit) : g[f.k];
+  const w = f.crit ? valorDe(otro,f.crit) : otro[f.k];
   if(v==null) return `<td class="dato comp-empate">—</td>`;
   let gana = false;
   if(f.mayor!==undefined && w!=null && v!==w) gana = f.mayor ? v>w : v<w;
-  const txt = Number(v).toFixed(f.dec)+f.suf;
+  const txt = es(v, f.dec)+f.suf;
   // barra relativa al mayor de los dos, para ver la diferencia de un vistazo
   let barra = "";
   if(f.mayor!==undefined && w!=null){
@@ -2542,7 +2707,9 @@ function pintarComparador(){
     if(f.sep) return `<tr class="sep"><td colspan="3">${f.sep}</td></tr>`;
     const clase = f.k==="indice" ? " total" : "";
     return `<tr class="${clase.trim()}">
-      <td class="var">${f.lab}${f.nota?`<small>${f.nota}</small>`:""}</td>
+      <td class="var">${f.lab}${f.crit
+        ? `<small>efecto medido ${es(CRIT[f.crit].d_cohen,2)}</small>`
+        : (f.nota?`<small>${f.nota}</small>`:"")}</td>
       ${celdaComp(a,f,b)}${celdaComp(b,f,a)}</tr>`;
   }).join("");
 
@@ -2573,7 +2740,7 @@ function pintarComparador(){
   pintarComparador();   // sin esta llamada la tabla arranca vacía
 })();
 
-// --- botonera del lote de predios ---
+// --- botonera del lote de grillas ---
 (function lotePredios(){
   const btn = (id, fn) => document.getElementById(id)?.addEventListener("click", fn);
   btn("loteVisibles", ()=>{ visibles().forEach(g=>LOTE.add(g.id)); render(); pintarLote(); });

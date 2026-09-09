@@ -15,7 +15,10 @@ mismo día tienen que obtener la misma nota para la misma grilla.
                    De ahí sale la d de Cohen con la que se pondera cada criterio.
 
     umbrales       Los tres puntos de la escala de cada criterio, leídos de la
-                   distribución de las plantas que ya operan.
+                   distribución de las plantas que ya operan (escala de grilla).
+
+    umbrales_lote  Lo mismo medido en el lote catastral de cada planta (escala de
+                   lote), que es lo que usa predios/lotes.py.
 
     subestaciones  Contraste de la capa de subestaciones contra OpenStreetMap, para
                    saber cuánta red le falta y si el criterio de conexión mide bien.
@@ -44,6 +47,7 @@ ANALISIS = {
     "pesos": "Efecto de cada covariable, la d que pondera los criterios",
     "umbrales": "Los tres puntos de la escala de cada criterio",
     "subestaciones": "Cuánta red le falta a la capa de subestaciones",
+    "umbrales_lote": "Los tres puntos de la escala medidos en los lotes de las plantas (escala de lote)",
 }
 
 

@@ -11,6 +11,10 @@ modelo se vuelve a correr y devuelve otras candidatas, no hay nada que ajustar a
 
 ## Puesta en marcha
 
+Lo de aquí abajo alcanza para generar el reporte en una máquina que ya tenga los datos.
+Para montarlo todo desde cero en una máquina nueva, con los permisos que hay que pedir y
+los datos que hay que traer del bucket, la guía es **[REPLICAR.md](REPLICAR.md)**.
+
 Desde la raíz del proyecto.
 
 **Windows**
@@ -130,7 +134,7 @@ que dos personas partan del mismo dato:
 |---|---|---|
 | `osm_vias` | respuestas de Overpass por bloque de celdas | OpenStreetMap |
 | `lineas_transmision` | líneas de transmisión, malla nacional | OpenStreetMap |
-| `capacidad_barras` | 14 informes de capacidad por barra | UPME |
+| `capacidad_barras` | 14 informes del ciclo 2023-2024, la Circular 054 de 2026 con su anexo (capacidad por barra 2026-2039) y la Circular 042 de 2026 con su proyecto de resolución de obras urgentes | UPME |
 | `restricciones` | Reserva Forestal de Ley 2ª de 1959 | MinAmbiente, SIAC |
 | `conflicto` | acciones bélicas desde 2022, un registro por hecho | SIEVCAC del CNMH |
 | `satelital` | una imagen por grilla | Esri World Imagery |
@@ -179,16 +183,14 @@ corte en kilómetros inventaría precisión que el dato no tiene. El umbral est�
 contra lo que el sector ya hace: de las diez plantas de 50 MW o más del país, ninguna
 está en un municipio que caiga bajo estos filtros.
 
-**Reserva Forestal de Ley 2ª**: solo si cubre el 90% o más de la celda. No es una
-prohibición como la de un parque. Reserva el suelo para economía forestal, y darle otro
-uso exige que el ministerio sustraiga esa porción, trámite de la Resolución 110 de 2022
-del MADS.[^1] Esa resolución pide que la actividad sea de utilidad pública, requisito que
-un proyecto solar ya cumple por el artículo 4 de la Ley 1715 de 2014.[^2] Con cobertura
-parcial el lote se sitúa fuera del polígono y no hay nada que tramitar.
-
-Queda un cabo suelto de campo: la línea de conexión puede cruzar la reserva aunque los
-paneles queden fuera, y para líneas de transmisión la Resolución 110 pide sustracción
-temporal.
+**Reserva Forestal de Ley 2ª**: se cruza y se informa (`ley2_pct`), pero **ya no
+excluye** (`LEY2_EXCLUYE = False`, decisión de agosto de 2026). Dos razones: en las cien
+candidatas no descartaba ninguna, y a escala de lote la zonificación del POT municipal
+trae la reserva forestal como categoría propia y con más autoridad, así que se lee allí.
+Cuando aparece, darle otro uso exige sustracción ante el MADS (Resolución 110 de
+2022),[^1] trámite al que un proyecto solar puede acceder por ser de utilidad pública
+según el artículo 4 de la Ley 1715 de 2014.[^2] Y la línea de conexión puede cruzar la
+reserva aunque los paneles queden fuera; para eso la resolución prevé sustracción temporal.
 
 [^1]: Resolución 110 de 2022 del MADS, que derogó la Resolución 1526 de 2012 salvo sus
     artículos 7 y 8. Fija el plazo en unos 85 días hábiles y remite las compensaciones al
@@ -237,6 +239,22 @@ Overpass cada vez, y un umbral que cambia solo es un umbral que nadie puede audi
 construido, no dónde conviene construir. Si el sector se equivocó de forma sistemática,
 el índice reproduce el error.
 
+**El criterio de capacidad de barra** lee la Circular Externa UPME 054 de 2026 y su anexo
+(capacidad disponible por barra 2026-2039, 645 subestaciones), que prevalece sobre los 14
+informes del ciclo 2023-2024 (`insumos/barras.py`, `barras_circular_054`). Del anexo se
+toman solo las tablas de la sección "capacidades por barra" que traen "Variable
+limitante"; la sección de "capacidad indicativa de fortaleza de red" repite cada barra con
+cifras miles de veces mayores y no es asignable. La circular no incorpora las obras de la
+Resolución UPME 567 de 2026 (obras urgentes por cortocircuito, definitiva desde el 6 de
+agosto de 2026; antes Circular 042) y la UPME la actualizará: cuando salga, reemplazar el PDF en
+`data/barras/upme/`, correr `python -m insumos.barras extraer` (regenera también la tabla
+completa `capacidad_upme_todas_*.csv`, que es la que lee el criterio) y `cargar`, subir
+`data/barras/` al bucket y regenerar el reporte. Ya no hay orden de llegada (CREG 101
+071 y 101 094 de 2025): de 10 MW en adelante asigna la UPME, por debajo el operador de
+red. Efecto en las cien candidatas: la capacidad en Sabanalarga, Caucasia, Cerromatoso y
+Toluviejo queda en cero o casi (0,00 a 0,08 MW), y en San Marcos en 19 MW; Planeta Rica
+(219 MW) y Calamar (48 MW) conservan holgura.
+
 ---
 
 ## Perfiles de proyecto
@@ -271,7 +289,7 @@ El perfil con el que se genera solo decide cuál sale seleccionado al abrir el a
 
 Cambios hechos para que el código corra en versiones actuales de las librerías.
 
-- **`PdfMerger` eliminado.** `functions.py` importaba `PyPDF2`, archivado desde 2023, y
+- **`PdfMerger` eliminado.** `modelo/functions.py` importaba `PyPDF2`, archivado desde 2023, y
   su sucesor `pypdf` eliminó `PdfMerger` en la versión 6. Se cambió por `PdfWriter`, que
   expone la misma interfaz.
 - **`import fiona` sin uso.** Retirado. `geopandas` 1.x ya usa `pyogrio`, y tener las dos

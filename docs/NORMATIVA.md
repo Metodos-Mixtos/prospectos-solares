@@ -1,7 +1,7 @@
 # Normativa que sustenta el reporte
 
 Los archivos están en `data/normativa`, espejados en
-`gs://prospectos_solares/insumos/normativa/`. Se bajan con `python normativa.py`.
+`gs://prospectos_solares/insumos/normativa/`. Se bajan con `python -m insumos normativa`.
 
 Cada norma está completa. No hay resúmenes ni abecés: sirven para entender,
 no para citar, porque recogen lo que la entidad quiso destacar y no el

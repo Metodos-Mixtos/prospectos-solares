@@ -104,6 +104,24 @@ INFORMES = {
     "Valle": "14_Informe_cap_barra_Valle_2",
 }
 
+#: Circular Externa UPME 054 de 2026: capacidad de barra para las 645 subestaciones del
+#: SIN, horizonte 2026-2039. Posterior al ciclo 2023-2024 y prevalece sobre él. Corte de
+#: información 5 de mayo de 2026; NO incorpora las obras de cortocircuito de la Circular
+#: 042 de 2026 (la UPME anuncia republicación): recargar cuando salga.
+CIRCULAR_054_URL = "https://docs.upme.gov.co/Normatividad/Circular_054_2026_y_anexos.pdf"
+CIRCULAR_054_PDF = "Circular_054_2026_y_anexos"
+FUENTE_054 = "UPME, Circular Externa 054 de 2026, capacidad de barra bajo escenario crítico"
+
+#: En la circular cada subestación aparece DOS veces con tablas de título casi idéntico:
+#: la de la sección 3 "Capacidades por barra" es la asignable (trae las columnas
+#: "Variable limitante" y "Contingencia"); la de la sección 4 "Capacidad indicativa
+#: asociada a métricas de fortaleza de red" no lo es y da valores cientos de veces
+#: mayores. Se acepta solo la primera.
+_TABLA_054 = re.compile(
+    r"Tabla \d+ Capacidad de barra disponible bajo escenarios cr[ií]ticos de operaci[oó]n "
+    r"y falla para la subestaci[oó]n\s+(.+?)\s+para cada a[ñn]o", re.S)
+_FILA_054 = re.compile(r"^(20\d{2})\s*\n\s*(-?\d+(?:[.,]\d+)?)\s*$", re.M)
+
 #: Cabecera de cada tabla, que es lo que delimita el bloque de una barra.
 _MARCADOR = re.compile(r"Datos de capacidad por barra resultante de\s+(.+?)\s+para cada a")
 #: Una fila de la tabla: año, capacidad y escenario crítico. Exigir el escenario evita
@@ -220,6 +238,71 @@ def descargar(forzar: bool = False, verbose: bool = True) -> list[Path]:
 # Lectura de los informes
 # --------------------------------------------------------------------------
 
+def descargar_circular_054(forzar: bool = False, verbose: bool = True) -> Path | None:
+    """Trae la Circular 054 (155 MB) a la caché si no está. Devuelve la ruta o None."""
+    import requests
+    CARPETA_PDF.mkdir(parents=True, exist_ok=True)
+    dest = CARPETA_PDF / f"{CIRCULAR_054_PDF}.pdf"
+    if dest.exists() and not forzar:
+        return dest
+    try:
+        r = requests.get(CIRCULAR_054_URL, headers={"User-Agent": "prospectos-solares/1.0"},
+                         timeout=600, stream=True)
+        r.raise_for_status()
+        with open(dest, "wb") as f:
+            for ch in r.iter_content(1 << 20):
+                f.write(ch)
+        return dest
+    except Exception as exc:
+        if verbose:
+            print(f"  aviso: no se pudo bajar la Circular 054 ({type(exc).__name__})")
+        return None
+
+
+def barras_circular_054(verbose: bool = True) -> pd.DataFrame:
+    """
+    Barras de la Circular 054 de 2026, una fila por barra y año, solo de las tablas
+    asignables (con "Variable limitante"). Vacío si el PDF no está o falta pymupdf.
+    """
+    pdf = CARPETA_PDF / f"{CIRCULAR_054_PDF}.pdf"
+    if not pdf.exists():
+        return pd.DataFrame()
+    try:
+        import fitz
+    except ImportError:
+        if verbose:
+            print("  aviso: falta pymupdf; la Circular 054 no se lee (pip install pymupdf)")
+        return pd.DataFrame()
+    doc = fitz.open(pdf)
+    filas = []
+    n_asignables = n_indicativas = 0
+    for pagina in doc:
+        texto = pagina.get_text()
+        marcas = list(_TABLA_054.finditer(texto))
+        for i, m in enumerate(marcas):
+            fin = marcas[i + 1].start() if i + 1 < len(marcas) else len(texto)
+            bloque = texto[m.end():fin]
+            if "limitante" not in bloque:
+                n_indicativas += 1
+                continue
+            n_asignables += 1
+            barra = " ".join(m.group(1).split())
+            variable = ""
+            mv = re.search(r"Agotamiento[^\n]*(?:\n[^\n]*){0,2}", bloque)
+            if mv:
+                variable = " ".join(mv.group(0).split())
+                variable = variable.split(" N/A")[0].strip()
+            for anio, mw in _FILA_054.findall(bloque):
+                filas.append({"subarea": "SIN", "barra": barra, "anio": int(anio),
+                              "mw": float(mw.replace(",", ".")), "escenario": "critico",
+                              "variable_limitante": variable, "fuente": "054-2026"})
+    if verbose:
+        print(f"  Circular 054/2026: {n_asignables} tablas asignables, "
+              f"{n_indicativas} indicativas descartadas, "
+              f"{len({f['barra'] for f in filas})} barras")
+    return pd.DataFrame(filas)
+
+
 def barras_upme(verbose: bool = True) -> pd.DataFrame:
     """Todas las barras de los informes, una fila por barra y año del horizonte."""
     import pypdf
@@ -267,6 +350,11 @@ def extraer(anio: int | None = None, verbose: bool = True) -> pd.DataFrame:
     import geopandas as gpd
 
     d = barras_upme(verbose=verbose)
+    # La Circular 054 de 2026 prevalece sobre el ciclo 2023-2024 donde exista: se une con
+    # subárea "SIN" y el emparejamiento la prefiere.
+    d054 = barras_circular_054(verbose=verbose)
+    if not d054.empty:
+        d = pd.concat([d, d054], ignore_index=True) if not d.empty else d054
     if d.empty:
         raise SystemExit("No hay informes legibles en data/barras/upme. "
                          "Corre antes 'python capacidad_barras.py descargar'.")
@@ -290,7 +378,8 @@ def extraer(anio: int | None = None, verbose: bool = True) -> pd.DataFrame:
         base, kv = _partir(barra)
         # Un puñado de barras aparece con la tabla repetida dentro del mismo informe,
         # con cifras distintas y sin decir cuál manda. Se toma la menor.
-        tabla = grupo.sort_values("mw").groupby("anio").first()[["mw", "escenario"]]
+        cols = ["mw", "escenario"] + (["variable_limitante"] if "variable_limitante" in grupo.columns else [])
+        tabla = grupo.sort_values("mw").groupby("anio").first()[cols]
         entrada = (barra, subarea, tabla)
         exactas.setdefault((base, _clase(kv)), []).append(entrada)
         corto = re.sub(r"^(nva?|nueva|nuevo)\s+", "", base)
@@ -315,11 +404,15 @@ def extraer(anio: int | None = None, verbose: bool = True) -> pd.DataFrame:
         if not presentes:
             sin_datos.append(nombre)
             continue
-        if len({round(v, 2) for v in presentes.values()}) > 1:
-            ambiguas.append((nombre, presentes))
-        elegida = min(presentes, key=lambda sa: presentes[sa])
+        if "SIN" in presentes:
+            elegida = "SIN"          # Circular 054 de 2026, más reciente
+        else:
+            if len({round(v, 2) for v in presentes.values()}) > 1:
+                ambiguas.append((nombre, presentes))
+            elegida = min(presentes, key=lambda sa: presentes[sa])
         mw, tabla = valores[elegida]
         barra = next(b for b, sa, _ in candidatas if sa == elegida)
+        es_054 = elegida == "SIN"
 
         filas.append({
             "subestacion": nombre,
@@ -330,8 +423,10 @@ def extraer(anio: int | None = None, verbose: bool = True) -> pd.DataFrame:
             "escenario_critico": str(tabla["escenario"].get(anio, "")),
             "barra_upme": barra,
             "subarea": elegida,
-            "ciclo": CICLO,
-            "fuente": FUENTE,
+            "ciclo": "2026 (Circular 054)" if es_054 else CICLO,
+            "fuente": FUENTE_054 if es_054 else FUENTE,
+            "variable_limitante": (str(tabla["variable_limitante"].iloc[0])
+                                   if es_054 and "variable_limitante" in tabla.columns else ""),
         })
 
     t = pd.DataFrame(filas)
@@ -371,9 +466,15 @@ def extraer_todas(anio: int | None = None, verbose: bool = True) -> pd.DataFrame
     justo donde se conecta un proyecto de 1 a 2 MW.
 
     Aquí se guarda todo, con el nombre base y la tensión separados, para poder buscar
-    después por subestación sin depender de que coincida el nivel de tensión.
+    después por subestación sin depender de que coincida el nivel de tensión. La
+    Circular 054 de 2026 prevalece sobre el ciclo 2023-2024 barra a barra.
     """
     d = barras_upme(verbose=verbose)
+    # La Circular 054 de 2026 (subárea "SIN") prevalece: donde trae la barra, se descartan
+    # las filas del ciclo 2023-2024 con el mismo nombre base y tensión.
+    d054 = barras_circular_054(verbose=verbose)
+    if not d054.empty:
+        d = pd.concat([d, d054], ignore_index=True) if not d.empty else d054
     if d.empty:
         raise SystemExit("No hay informes legibles en data/barras/upme.")
 
@@ -388,6 +489,7 @@ def extraer_todas(anio: int | None = None, verbose: bool = True) -> pd.DataFrame
         mw = tabla["mw"].get(anio)
         if mw is None:
             continue
+        es_054 = subarea == "SIN"
         filas.append({
             "barra": barra,
             "base": ALIAS.get(base, base),
@@ -397,11 +499,19 @@ def extraer_todas(anio: int | None = None, verbose: bool = True) -> pd.DataFrame
             "anio": anio,
             "escenario_critico": str(tabla["escenario"].get(anio, "")),
             "subarea": subarea,
-            "ciclo": CICLO,
-            "fuente": FUENTE,
+            "ciclo": "2026 (Circular 054)" if es_054 else CICLO,
+            "fuente": FUENTE_054 if es_054 else FUENTE,
         })
 
     t = pd.DataFrame(filas)
+    if len(t) and (t["subarea"] == "SIN").any():
+        clave = t["base"] + "|" + t["kv"].map(_clase).astype(str)
+        con_054 = set(clave[t["subarea"] == "SIN"])
+        antes = len(t)
+        t = t[(t["subarea"] == "SIN") | ~clave.isin(con_054)].reset_index(drop=True)
+        if verbose:
+            print(f"  Circular 054: {int((t['subarea'] == 'SIN').sum())} barras; "
+                  f"{antes - len(t)} filas del ciclo {CICLO} reemplazadas")
     CARPETA.mkdir(parents=True, exist_ok=True)
     destino = CARPETA / f"capacidad_upme_todas_{CICLO.replace('-', '_')}.csv"
     t.to_csv(destino, index=False, sep=";", decimal=",", encoding="utf-8-sig")
@@ -585,7 +695,10 @@ def main(argv=None) -> int:
         print("LECTURA DE LOS INFORMES")
         print("=" * 74)
         extraer(anio=a.anio)
-        print("  Ahora: python capacidad_barras.py cargar")
+        # La tabla completa (todas las barras, incluida media tensión) es la que lee el
+        # criterio de capacidad de los reportes; se regenera aquí mismo.
+        extraer_todas(anio=a.anio)
+        print("  Ahora: python -m insumos.barras cargar")
         return 0
 
     if a.accion == "plantilla":
