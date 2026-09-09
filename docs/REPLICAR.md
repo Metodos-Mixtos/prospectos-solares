@@ -453,6 +453,5 @@ nada y varias apuntan a páginas que ya cambiaron.
 | [PREDIOS.md](PREDIOS.md) | el procedimiento de lote, paso a paso, con las comprobaciones intermedias |
 | [ADQUISICION.md](ADQUISICION.md) | la ruta jurídica y de costos hasta la escritura |
 | [NORMATIVA.md](NORMATIVA.md) | las normas que sustentan los criterios |
-| [CONTINUIDAD.md](CONTINUIDAD.md) | el estado del trabajo y lo que queda por hacer |
 | `outputs/PROCEDIMIENTO_LOTES.md` | el procedimiento completo, con qué es automático y qué no |
 | `.env.example` | cada credencial, para qué sirve, de dónde sale y qué pasa si falta |

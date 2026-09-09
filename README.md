@@ -396,7 +396,6 @@ paso, y `_corrida.log`, la salida completa.
 | [`docs/PREDIOS.md`](docs/PREDIOS.md) | la caracterización de lotes |
 | [`docs/ADQUISICION.md`](docs/ADQUISICION.md) | la ruta jurídica y de costos hasta la escritura |
 | [`docs/NORMATIVA.md`](docs/NORMATIVA.md) | el marco normativo aplicable |
-| [`docs/CONTINUIDAD.md`](docs/CONTINUIDAD.md) | estado del trabajo y qué sigue |
 | [`docs/diagramas/`](docs/diagramas/) | los dos diagramas interactivos del flujo completo |
 
 Cada paquete se explica solo:

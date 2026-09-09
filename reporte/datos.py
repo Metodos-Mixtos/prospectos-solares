@@ -1,7 +1,7 @@
 """
 Reporte de caracterización de las grillas candidatas.
 
-Responde al primer bloque de pasos-a-seguir.md:
+Responde al primer bloque del plan del proyecto:
   - Reporte por grilla con radiación, jurisdicciones especiales, etc.
   - Identificación del operador de red
   - Configuración de barras de la subestación de conexión

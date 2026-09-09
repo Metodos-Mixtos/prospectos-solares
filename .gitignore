@@ -161,3 +161,8 @@ docs/*Notes by*
 docs/*Notas de*
 *Notes by Gemini*
 
+# Documentacion interna de proceso: traspaso entre sesiones y plan con estado por
+# fecha. Util hacia adentro, pero no documenta lo que corre y envejece sola.
+docs/CONTINUIDAD.md
+docs/pasos-a-seguir.md
+
